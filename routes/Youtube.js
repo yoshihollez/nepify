@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React from 'react';
+import {TextInput, Button} from 'react-native-paper';
 import {
   StyleSheet,
   Text,
@@ -8,7 +9,6 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {TextInput, Button} from 'react-native-paper';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 export default class Youtube extends React.Component {
   constructor(props) {
@@ -30,12 +30,12 @@ export default class Youtube extends React.Component {
     };
   }
   componentDidMount = async () => {
-    if (!(await this.filehandler.doesFileExist('PlayList'))) {
-      console.log("PlayList file doens't exist");
+    if ((await this.filehandler.loadFile('PlayList')) == null) {
+      // console.log("PlayList file doens't exist");
       await this.filehandler.saveFile('PlayList', []);
     }
-    if (!(await this.filehandler.doesFileExist('PlayListsNames'))) {
-      console.log("PlayListsNames file doens't exist");
+    if ((await this.filehandler.loadFile('PlayListsNames')) == null) {
+      // console.log("PlayListsNames file doens't exist");
       await this.filehandler.saveFile('PlayListsNames', [
         {
           value: 'PlayList',
@@ -46,6 +46,7 @@ export default class Youtube extends React.Component {
         },
       ]);
     } else {
+      // console.log('PlayListsNames file exists');
       // console.log(await this.filehandler.loadFile('PlayListsNames'));
     }
   };

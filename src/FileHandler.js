@@ -20,15 +20,6 @@ export default class FileHandler {
       console.log(error);
     }
   };
-  doesFileExist = async fileName => {
-    try {
-      let temp = await AsyncStorage.getItem(fileName);
-      // console.log(JSON.parse(temp));
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
   saveFile = async (fileName = 'PlayList', data) => {
     try {
       // console.log(fileName);

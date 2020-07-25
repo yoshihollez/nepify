@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React from 'react';
+import {Button, TextInput} from 'react-native-paper';
 import {
   Dimensions,
   Image,
@@ -8,7 +9,6 @@ import {
   View,
   FlatList,
 } from 'react-native';
-import {Button, TextInput} from 'react-native-paper';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from '../src/RNPickerSelect';
 export default class PlayList extends React.Component {

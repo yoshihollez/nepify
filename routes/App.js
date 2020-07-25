@@ -1,5 +1,5 @@
-import * as React from 'react';
-import {BottomNavigation, Text} from 'react-native-paper';
+import React from 'react';
+import {BottomNavigation} from 'react-native-paper';
 import PlayList from './PlayList';
 import Youtube from './Youtube';
 import SoundHandler from '../src/SoundHandler';
