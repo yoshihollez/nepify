@@ -48,7 +48,7 @@ export default class PlayList extends React.Component {
       this.setState({playListIndex: index});
       console.log(this.state.currentSong);
       console.log(this.state.playlist[index]);
-      this.soundObject.getSongURL(
+      this.soundObject.playSong(
         this.state.currentSong,
         this.state.playlist[index],
         this.setParentState,
