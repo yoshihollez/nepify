@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from '../src/RNPickerSelect';
+
 export default class PlayList extends React.Component {
   constructor(props) {
     super(props);
@@ -97,6 +98,14 @@ export default class PlayList extends React.Component {
       }
     }
   };
+  shufflePlayList = array => {
+    array.sort(() => Math.random() - 0.5);
+    this.setState({playlist: array});
+  };
+  newPlayList = async value => {
+    await this.setState({playListName: value});
+    this.refresh();
+  };
 
   render = () => {
     return (
@@ -104,9 +113,7 @@ export default class PlayList extends React.Component {
         <View>
           <RNPickerSelect
             placeholder={{}}
-            onValueChange={async value =>
-              await this.setState({playListName: value})
-            }
+            onValueChange={async value => await this.newPlayList(value)}
             value={this.state.playListName}
             items={this.state.playListsNames}
           />
@@ -122,7 +129,7 @@ export default class PlayList extends React.Component {
         </View>
         <View style={styles.bottomButtons}>
           <TouchableOpacity
-            style={{width: screenWidth / 2}}
+            style={{width: screenWidth / 3}}
             onPress={async () => {
               await this.youTubeAPI.getYoutubePlayList(this.state.value),
                 this.refresh();
@@ -130,21 +137,28 @@ export default class PlayList extends React.Component {
             <Text style={styles.item}>add playlist</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{width: screenWidth / 2}}
+            style={{width: screenWidth / 3}}
+            onPress={async () => {
+              this.shufflePlayList(this.state.playlist);
+            }}>
+            <Text style={styles.item}>shuffle</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{width: screenWidth / 3}}
             onPress={async () => {
               this.removePlayList(this.state.playListName);
               this.filehandler.deleteFile(this.state.playListName);
             }}>
             <Text style={styles.item}>remove playlist</Text>
           </TouchableOpacity>
-          <Button
+          {/* <Button
             icon="refresh"
             style={{
               position: 'absolute',
               right: 0,
             }}
             onPress={async () => this.refresh()}
-          />
+          /> */}
         </View>
         <View
           style={{

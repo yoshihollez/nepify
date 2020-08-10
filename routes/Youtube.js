@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 export default class Youtube extends React.Component {
   constructor(props) {
