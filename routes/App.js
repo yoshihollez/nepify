@@ -5,6 +5,17 @@ import Youtube from './Youtube';
 import SoundHandler from '../src/SoundHandler';
 import Filehandler from '../src/FileHandler';
 import YouTubeAPI from '../src/YouTubeAPI';
+
+import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
+
+RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
+  isEnabled => {
+    if (isEnabled) {
+      RNDisableBatteryOptimizationsAndroid.openBatteryModal();
+    }
+  },
+);
+
 let soundObject = new SoundHandler();
 let filehandler = new Filehandler();
 let youTubeAPI = new YouTubeAPI();
