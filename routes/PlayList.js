@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from '../src/RNPickerSelect';
+// import RNPickerSelect from 'react-native-picker-select';
 
 export default class PlayList extends React.Component {
   constructor(props) {
@@ -28,7 +29,7 @@ export default class PlayList extends React.Component {
       playlist: [],
       trackLength: 1,
       trackPosition: 0,
-      value: 'PL3AStYGqDKPyIkNTdHy9gEf35CNDKgL6b',
+      value: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
     };
   }
   componentDidMount = async () => {
@@ -41,7 +42,7 @@ export default class PlayList extends React.Component {
     console.log('nextsong');
     this.startPlayListFrom(this.state.playListIndex + 1);
   };
-  startPlayListFrom = index => {
+  startPlayListFrom = (index) => {
     console.log(index);
     console.log('startPlayListFrom');
 
@@ -57,15 +58,15 @@ export default class PlayList extends React.Component {
       );
     }
   };
-  setParentState = data => {
+  setParentState = (data) => {
     this.setState(data);
   };
-  removeFromPlayList = async index => {
+  removeFromPlayList = async (index) => {
     let playlist = await this.filehandler.loadFile();
     playlist.splice(index, 1);
     this.saveFile(playlist);
   };
-  saveFile = async data => {
+  saveFile = async (data) => {
     // console.log(data);
     try {
       this.filehandler.saveFile('PlayList', data);
@@ -87,7 +88,7 @@ export default class PlayList extends React.Component {
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
     });
   };
-  removePlayList = async playListName => {
+  removePlayList = async (playListName) => {
     for (let index = 0; index < this.state.playListsNames.length; index++) {
       const element = this.state.playListsNames[index].value;
       if (element == playListName && playListName != 'PlayList') {
@@ -98,11 +99,11 @@ export default class PlayList extends React.Component {
       }
     }
   };
-  shufflePlayList = array => {
+  shufflePlayList = (array) => {
     array.sort(() => Math.random() - 0.5);
     this.setState({playlist: array});
   };
-  newPlayList = async value => {
+  test = async (value) => {
     await this.setState({playListName: value});
     this.refresh();
   };
@@ -113,7 +114,7 @@ export default class PlayList extends React.Component {
         <View>
           <RNPickerSelect
             placeholder={{}}
-            onValueChange={async value => await this.newPlayList(value)}
+            onValueChange={async (value) => await this.test(value)}
             value={this.state.playListName}
             items={this.state.playListsNames}
           />
@@ -124,7 +125,7 @@ export default class PlayList extends React.Component {
               height: screenHeight / 32,
             }}
             placeholder={'Enter youtube playlist id here.'}
-            onChangeText={text => this.onChangeText(text)}
+            onChangeText={(text) => this.onChangeText(text)}
           />
         </View>
         <View style={styles.bottomButtons}>
