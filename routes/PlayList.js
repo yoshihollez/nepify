@@ -10,8 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
-import RNPickerSelect from '../src/RNPickerSelect';
-// import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from 'react-native-picker-select';
 
 export default class PlayList extends React.Component {
   constructor(props) {
@@ -26,56 +25,49 @@ export default class PlayList extends React.Component {
       icon: 'play',
       playListIndex: 0,
       playListName: 'PlayList',
-      playlist: [],
+      playList: [],
       trackLength: 1,
       trackPosition: 0,
       value: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
     };
   }
   componentDidMount = async () => {
+    playList = await this.filehandler.loadFile();
+    this.soundObject.setPlayList(playList);
     this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
-      playlist: await this.filehandler.loadFile(),
+      playList: playList,
     });
   };
   nextSong = () => {
     console.log('nextsong');
     this.startPlayListFrom(this.state.playListIndex + 1);
   };
-  startPlayListFrom = index => {
-    console.log(index);
+  startPlayListFrom = (index) => {
     console.log('startPlayListFrom');
-
-    if (index >= 0 && index < this.state.playlist.length) {
+    if (index >= 0 && index < this.state.playList.length) {
       this.setState({playListIndex: index});
-      console.log(this.state.currentSong);
-      console.log(this.state.playlist[index]);
       this.soundObject.playSong(
         this.state.currentSong,
-        this.state.playlist[index],
+        this.state.playList[index],
         this.setParentState,
         this.nextSong,
       );
     }
   };
-  setParentState = data => {
+  setParentState = (data) => {
     this.setState(data);
   };
-  removeFromPlayList = async index => {
-    let playlist = await this.filehandler.loadFile();
-    playlist.splice(index, 1);
-    this.saveFile(playlist);
+  removeFromPlayList = async (index, playListName) => {
+    let playList = await this.filehandler.loadFile(playListName);
+    playList.splice(index, 1);
+    this.saveFile(playListName, playList);
   };
-  saveFile = async data => {
-    // console.log(data);
-    try {
-      this.filehandler.saveFile('PlayList', data);
-      this.setState({
-        playlist: await this.filehandler.loadFile(),
-      });
-    } catch (error) {
-      console.log(error);
-    }
+  saveFile = async (playListName, data) => {
+    this.filehandler.saveFile(playListName, data);
+    this.setState({
+      playList: await this.filehandler.loadFile(playListName),
+    });
   };
   onChangeText(text) {
     this.setState({
@@ -83,12 +75,14 @@ export default class PlayList extends React.Component {
     });
   }
   refresh = async () => {
+    playList = await this.filehandler.loadFile(this.state.playListName);
+    this.soundObject.setPlayList(playList);
     this.setState({
-      playlist: await this.filehandler.loadFile(this.state.playListName),
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
+      playList: playList,
     });
   };
-  removePlayList = async playListName => {
+  removePlayList = async (playListName) => {
     for (let index = 0; index < this.state.playListsNames.length; index++) {
       const element = this.state.playListsNames[index].value;
       if (element == playListName && playListName != 'PlayList') {
@@ -99,11 +93,11 @@ export default class PlayList extends React.Component {
       }
     }
   };
-  shufflePlayList = array => {
+  shufflePlayList = (array) => {
     array.sort(() => Math.random() - 0.5);
-    this.setState({playlist: array});
+    this.setState({playList: array});
   };
-  setPlayListName = async value => {
+  setPlayListName = async (value) => {
     await this.setState({playListName: value});
     this.refresh();
   };
@@ -114,7 +108,7 @@ export default class PlayList extends React.Component {
         <View>
           <RNPickerSelect
             placeholder={{}}
-            onValueChange={async value => await this.setPlayListName(value)}
+            onValueChange={async (value) => await this.setPlayListName(value)}
             value={this.state.playListName}
             items={this.state.playListsNames}
           />
@@ -125,7 +119,7 @@ export default class PlayList extends React.Component {
               height: screenHeight / 32,
             }}
             placeholder={'Enter youtube playlist id here.'}
-            onChangeText={text => this.onChangeText(text)}
+            onChangeText={(text) => this.onChangeText(text)}
           />
         </View>
         <View style={styles.bottomButtons}>
@@ -140,7 +134,7 @@ export default class PlayList extends React.Component {
           <TouchableOpacity
             style={{width: screenWidth / 3}}
             onPress={async () => {
-              this.shufflePlayList(this.state.playlist);
+              this.shufflePlayList(this.state.playList);
             }}>
             <Text style={styles.item}>shuffle</Text>
           </TouchableOpacity>
@@ -167,7 +161,7 @@ export default class PlayList extends React.Component {
             height: screenHeight / 1.65,
           }}>
           <FlatList
-            data={this.state.playlist}
+            data={this.state.playList}
             renderItem={({item, index}) => (
               <TouchableOpacity
                 onPress={() => this.startPlayListFrom(index)}
@@ -180,7 +174,9 @@ export default class PlayList extends React.Component {
                     right: 0,
                   }}
                   icon="playlist-remove"
-                  onPress={() => this.removeFromPlayList(index)}
+                  onPress={() =>
+                    this.removeFromPlayList(index, this.state.playListName)
+                  }
                 />
               </TouchableOpacity>
             )}
@@ -192,7 +188,10 @@ export default class PlayList extends React.Component {
               icon="rewind"
               style={styles.button}
               onPress={() =>
-                this.startPlayListFrom(this.state.playListIndex - 1)
+                this.startPlayListFrom(
+                  this.state.playListIndex - 1,
+                  this.state.playList.length,
+                )
               }
             />
             <Button
