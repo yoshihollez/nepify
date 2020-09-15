@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   View,
   FlatList,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from 'react-native-picker-select';
@@ -27,6 +29,7 @@ export default class PlayList extends React.Component {
       trackLength: 1,
       trackPosition: 0,
       playListID: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
+      refreshing: false,
     };
   }
   componentDidMount = async () => {
@@ -59,6 +62,7 @@ export default class PlayList extends React.Component {
     });
   }
   refresh = async () => {
+    console.log('refresh');
     playList = await this.filehandler.loadFile(this.state.playListName);
     this.soundObject.setPlayList(playList);
     this.soundObject.setPlayListName(this.state.playListName);
@@ -91,6 +95,9 @@ export default class PlayList extends React.Component {
     this.refresh();
   };
 
+  onRefresh() {
+    this.refresh;
+  }
   render = () => {
     return (
       <View style={styles.container}>
@@ -135,14 +142,6 @@ export default class PlayList extends React.Component {
             }}>
             <Text style={styles.item}>remove playlist</Text>
           </TouchableOpacity>
-          {/* <Button
-            icon="refresh"
-            style={{
-              position: 'absolute',
-              right: 0,
-            }}
-            onPress={async () => this.refresh()}
-          /> */}
         </View>
         <View
           style={{
@@ -171,6 +170,13 @@ export default class PlayList extends React.Component {
                 />
               </TouchableOpacity>
             )}
+            refreshControl={
+              <RefreshControl
+                //refresh control used for the Pull to Refresh
+                refreshing={this.state.refreshing}
+                onRefresh={this.refresh}
+              />
+            }
           />
         </View>
         <View style={styles.bottom}>
