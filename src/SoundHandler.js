@@ -7,12 +7,21 @@ export default class SoundHandler {
   constructor() {
     this.soundObject = new Sound('', null);
     this.setNextSong;
+    this.currentSong = 'leeg';
+    this.playList = [];
+    this.playListName;
+    this.playListIndex = 0;
+    this.icon = 'play';
   }
-  playTrack = uri => {
+  getIcon = () => {
+    return this.icon;
+  };
+  playTrack = (uri) => {
     console.log('playtrack');
     if (!this.soundObject.isLoaded()) {
+      console.log(this.soundObject.isLoaded());
       try {
-        this.soundObject = new Sound(uri, null, e => {
+        this.soundObject = new Sound(uri, null, (e) => {
           if (e) {
             console.log('error loading track:', e);
           } else {
@@ -38,7 +47,7 @@ export default class SoundHandler {
   resumeTrack = () => {
     console.log('resumeTrack');
     try {
-      this.soundObject.play(success => {
+      this.soundObject.play((success) => {
         if (success) {
           console.log('successfully finished playing');
           this.setNextSong();
@@ -59,13 +68,15 @@ export default class SoundHandler {
       console.log(error);
     }
   };
-  handleTrackPlayer = uri => {
+  handleTrackPlayer = (uri) => {
     console.log('handleTrackPlayer');
     if (this.soundObject.isPlaying()) {
       this.pauseTrack();
+      this.icon = 'play';
       return {icon: 'play'};
     } else {
       this.playTrack(uri);
+      this.icon = 'pause';
       return {icon: 'pause'};
     }
   };
@@ -75,16 +86,14 @@ export default class SoundHandler {
     this.setNextSong = nextSong;
     this.pauseTrack();
     //if statement currently of no use
-    if (currentSong != item.songName) {
-      let urls = await youTubeAPI.getSongURLS(
+    if (this.currentSong != item.songName) {
+      this.currentSong = item.songName;
+      this.urls = await youTubeAPI.getSongURLS(
         'https://www.youtube.com/watch?v=' + item.key,
       );
-      // console.log(urls[0].url);
       this.unloadTrack();
       setParentState({
-        currentSong: item.videoTitle,
-        uri: urls[0].url,
-        icon: this.handleTrackPlayer(urls[0].url).icon,
+        icon: this.handleTrackPlayer(this.urls[0].url).icon,
       });
     } else {
       return this.handleTrackPlayer();
@@ -92,5 +101,33 @@ export default class SoundHandler {
   };
   getSoundObject = () => {
     return this.soundObject;
+  };
+  setPlayList = (playList) => {
+    this.playList = playList;
+  };
+  setPlayListName = (playListName) => {
+    this.playListName = playListName;
+  };
+
+  startPlayListFrom = (index, setParentState) => {
+    console.log('startPlayListFrom');
+    if (index == 'next') {
+      index = this.playListIndex + 1;
+    } else if (index == 'previous') {
+      index = this.playListIndex - 1;
+    }
+    if (index >= 0 && index < this.playList.length) {
+      this.playListIndex = index;
+      this.playSong(
+        this.currentSong,
+        this.playList[index],
+        setParentState,
+        this.nextSong,
+      );
+    }
+  };
+  nextSong = () => {
+    console.log('nextsong');
+    this.startPlayListFrom(this.playListIndex + 1);
   };
 }

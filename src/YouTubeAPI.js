@@ -9,7 +9,7 @@ export default class YouTubeAPI {
     this.key = API_KEY;
   }
 
-  getYoutubeVids = async searchValue => {
+  getYoutubeVids = async (searchValue) => {
     let temp = [];
     let url =
       'https://www.googleapis.com/youtube/v3/search?key=' +
@@ -18,8 +18,8 @@ export default class YouTubeAPI {
       searchValue +
       '&maxResults=25&type=video';
     await fetch(url)
-      .then(response => response.json())
-      .then(responseJson => {
+      .then((response) => response.json())
+      .then((responseJson) => {
         for (let index = 0; index < responseJson.items.length; index++) {
           const element = responseJson.items[index];
           temp.push({
@@ -30,19 +30,26 @@ export default class YouTubeAPI {
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
 
     return {results: temp, showCarousel: true};
   };
-  getSongURLS = async url => {
+  getSongURLS = async (url) => {
+    console.log('getSongURLS');
+
+    console.log(
+      await ytdl(url, {
+        quality: 'highestaudio',
+      }),
+    );
     return await ytdl(url, {
       quality: 'highestaudio',
     });
   };
 
-  getYoutubePlayList = async playListID => {
+  getYoutubePlayList = async (playListID) => {
     try {
       let newPlayListArray = [];
       let token = '';
@@ -62,12 +69,12 @@ export default class YouTubeAPI {
           '&pageToken=' +
           token;
         await fetch(url)
-          .then(response => response.json())
-          .then(responseJson => {
+          .then((response) => response.json())
+          .then((responseJson) => {
             if (responseJson.nextPageToken) {
               token = responseJson.nextPageToken;
             } else token = false;
-            responseJson.items.forEach(item => {
+            responseJson.items.forEach((item) => {
               newPlayListArray.push({
                 key: item.snippet.resourceId.videoId,
                 songName: item.snippet.title
@@ -77,7 +84,7 @@ export default class YouTubeAPI {
               });
             });
           })
-          .catch(error => {
+          .catch((error) => {
             console.error(error);
           });
       } while (token);
@@ -97,8 +104,8 @@ export default class YouTubeAPI {
         '&fields=items(localizations%2Csnippet%2Flocalized%2Ftitle)&key=' +
         this.key;
       playListName = await fetch(urlForPlayListName)
-        .then(response => response.json())
-        .then(responseJson => {
+        .then((response) => response.json())
+        .then((responseJson) => {
           return responseJson.items[0].snippet.localized.title;
         });
 

@@ -31,6 +31,7 @@ export default class Youtube extends React.Component {
     };
   }
   componentDidMount = async () => {
+    this.setState({icon: this.soundObject.getIcon()});
     if ((await this.filehandler.loadFile('PlayList')) == null) {
       // console.log("PlayList file doens't exist");
       await this.filehandler.saveFile('PlayList', []);
@@ -56,7 +57,27 @@ export default class Youtube extends React.Component {
       value: text,
     });
   }
-  addToPlayList = async item => {
+  startPlayListFrom = (index) => {
+    console.log(index);
+    console.log('startPlayListFrom');
+
+    if (index >= 0 && index < this.state.playlist.length) {
+      this.setState({playListIndex: index});
+      console.log(this.state.currentSong);
+      console.log(this.state.playlist[index]);
+      this.soundObject.playSong(
+        this.state.currentSong,
+        this.state.playlist[index],
+        this.setParentState,
+        this.nextSong,
+      );
+    }
+  };
+  nextSong = () => {
+    console.log('nextsong');
+    this.startPlayListFrom(this.state.playListIndex + 1);
+  };
+  addToPlayList = async (item) => {
     let playList = [];
     let temp = await this.filehandler.loadFile();
     console.log('temp');
@@ -64,7 +85,9 @@ export default class Youtube extends React.Component {
     if (temp != null) {
       playList = temp;
     }
-    const alreadyContains = playList.some(element => element.key === item.key);
+    const alreadyContains = playList.some(
+      (element) => element.key === item.key,
+    );
 
     if (!alreadyContains) {
       console.log('adding');
@@ -75,7 +98,7 @@ export default class Youtube extends React.Component {
     }
   };
 
-  setParentState = data => {
+  setParentState = (data) => {
     this.setState(data);
   };
 
@@ -87,7 +110,7 @@ export default class Youtube extends React.Component {
             style={{
               width: screenWidth / 2,
             }}
-            onChangeText={text => this.onChangeText(text)}
+            onChangeText={(text) => this.onChangeText(text)}
           />
           <Button
             icon="search-web"
@@ -104,7 +127,7 @@ export default class Youtube extends React.Component {
             paddingLeft: 5,
             paddingBottom: 25,
             paddingTop: 15,
-            height: screenHeight / 1.4,
+            height: screenHeight / 1.5,
           }}>
           <FlatList
             data={this.state.results}
@@ -156,7 +179,10 @@ export default class Youtube extends React.Component {
               icon="rewind"
               style={styles.button}
               onPress={() =>
-                this.startPlayListFrom(this.state.playListIndex - 1)
+                this.soundObject.startPlayListFrom(
+                  'previous',
+                  this.setParentState,
+                )
               }
             />
             <Button
@@ -172,7 +198,7 @@ export default class Youtube extends React.Component {
               icon="fast-forward"
               style={styles.button}
               onPress={() =>
-                this.startPlayListFrom(this.state.playListIndex + 1)
+                this.soundObject.startPlayListFrom('next', this.setParentState)
               }
             />
           </View>

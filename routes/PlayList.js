@@ -21,39 +21,22 @@ export default class PlayList extends React.Component {
     this.youTubeAPI = props.youTubeAPI;
     this.state = {
       playListsNames: [{label: 'test', value: 'PlayList'}],
-      currentSong: '',
       icon: 'play',
-      playListIndex: 0,
       playListName: 'PlayList',
       playList: [],
       trackLength: 1,
       trackPosition: 0,
-      value: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
+      playListID: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
     };
   }
   componentDidMount = async () => {
     playList = await this.filehandler.loadFile();
     this.soundObject.setPlayList(playList);
+    this.soundObject.setPlayListName(this.state.playListName);
     this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
       playList: playList,
     });
-  };
-  nextSong = () => {
-    console.log('nextsong');
-    this.startPlayListFrom(this.state.playListIndex + 1);
-  };
-  startPlayListFrom = (index) => {
-    console.log('startPlayListFrom');
-    if (index >= 0 && index < this.state.playList.length) {
-      this.setState({playListIndex: index});
-      this.soundObject.playSong(
-        this.state.currentSong,
-        this.state.playList[index],
-        this.setParentState,
-        this.nextSong,
-      );
-    }
   };
   setParentState = (data) => {
     this.setState(data);
@@ -61,6 +44,7 @@ export default class PlayList extends React.Component {
   removeFromPlayList = async (index, playListName) => {
     let playList = await this.filehandler.loadFile(playListName);
     playList.splice(index, 1);
+    this.soundObject.setPlayList(playList);
     this.saveFile(playListName, playList);
   };
   saveFile = async (playListName, data) => {
@@ -71,12 +55,15 @@ export default class PlayList extends React.Component {
   };
   onChangeText(text) {
     this.setState({
-      value: text,
+      playListID: text,
     });
   }
   refresh = async () => {
     playList = await this.filehandler.loadFile(this.state.playListName);
     this.soundObject.setPlayList(playList);
+    this.soundObject.setPlayListName(this.state.playListName);
+    // console.log(playList);
+    // console.log(this.state.playListName);
     this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
       playList: playList,
@@ -98,6 +85,8 @@ export default class PlayList extends React.Component {
     this.setState({playList: array});
   };
   setPlayListName = async (value) => {
+    console.log('setPlayListName');
+    this.soundObject.setPlayListName(value);
     await this.setState({playListName: value});
     this.refresh();
   };
@@ -126,7 +115,7 @@ export default class PlayList extends React.Component {
           <TouchableOpacity
             style={{width: screenWidth / 3}}
             onPress={async () => {
-              await this.youTubeAPI.getYoutubePlayList(this.state.value),
+              await this.youTubeAPI.getYoutubePlayList(this.state.playListID),
                 this.refresh();
             }}>
             <Text style={styles.item}>add playlist</Text>
@@ -164,7 +153,9 @@ export default class PlayList extends React.Component {
             data={this.state.playList}
             renderItem={({item, index}) => (
               <TouchableOpacity
-                onPress={() => this.startPlayListFrom(index)}
+                onPress={() =>
+                  this.soundObject.startPlayListFrom(index, this.setParentState)
+                }
                 style={{flexDirection: 'row'}}>
                 <Image style={styles.image} source={{uri: item.imageURL}} />
                 <Text style={styles.item}>{item.songName}</Text>
@@ -188,9 +179,9 @@ export default class PlayList extends React.Component {
               icon="rewind"
               style={styles.button}
               onPress={() =>
-                this.startPlayListFrom(
-                  this.state.playListIndex - 1,
-                  this.state.playList.length,
+                this.soundObject.startPlayListFrom(
+                  'previous',
+                  this.setParentState,
                 )
               }
             />
@@ -205,7 +196,7 @@ export default class PlayList extends React.Component {
               icon="fast-forward"
               style={styles.button}
               onPress={() =>
-                this.startPlayListFrom(this.state.playListIndex + 1)
+                this.soundObject.startPlayListFrom('next', this.setParentState)
               }
             />
           </View>

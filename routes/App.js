@@ -8,7 +8,7 @@ import YouTubeAPI from '../src/YouTubeAPI';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
 
 RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
-  isEnabled => {
+  (isEnabled) => {
     if (isEnabled) {
       RNDisableBatteryOptimizationsAndroid.openBatteryModal();
     }
@@ -51,7 +51,7 @@ export default class App extends React.Component {
     ],
   };
 
-  _handleIndexChange = index => this.setState({index});
+  _handleIndexChange = (index) => this.setState({index});
 
   _renderScene = BottomNavigation.SceneMap({
     music: searchSongs,
