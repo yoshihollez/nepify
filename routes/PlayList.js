@@ -21,6 +21,7 @@ export default class PlayList extends React.Component {
     this.soundObject = props.soundObject;
     this.filehandler = props.filehandler;
     this.youTubeAPI = props.youTubeAPI;
+    this.soundObject.setPlayListState(this.setParentState);
     this.state = {
       playListsNames: [{label: 'test', value: 'PlayList'}],
       icon: 'play',
@@ -33,6 +34,8 @@ export default class PlayList extends React.Component {
     };
   }
   componentDidMount = async () => {
+    this.setState({icon: this.soundObject.getIcon()});
+    console.log(this.state.icon);
     playList = await this.filehandler.loadFile();
     this.soundObject.setPlayList(playList);
     this.soundObject.setPlayListName(this.state.playListName);
@@ -42,6 +45,7 @@ export default class PlayList extends React.Component {
     });
   };
   setParentState = (data) => {
+    // console.log(data);
     this.setState(data);
   };
   removeFromPlayList = async (index, playListName) => {
@@ -194,9 +198,7 @@ export default class PlayList extends React.Component {
             <Button
               icon={this.state.icon}
               style={styles.button}
-              onPress={() =>
-                this.setState(this.soundObject.handleTrackPlayer())
-              }
+              onPress={() => this.soundObject.handleTrackPlayer()}
             />
             <Button
               icon="fast-forward"
@@ -206,12 +208,6 @@ export default class PlayList extends React.Component {
               }
             />
           </View>
-          {/* <Slider
-            value={this.state.trackPosition}
-            onSlidingComplete={this.onSeekSliderSlidingComplete}
-            disabled={this.state.isLoading}
-            maximumValue={this.state.trackLength}
-          /> */}
         </View>
       </View>
     );

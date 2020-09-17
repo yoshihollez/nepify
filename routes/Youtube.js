@@ -17,6 +17,7 @@ export default class Youtube extends React.Component {
     this.soundObject = props.soundObject;
     this.filehandler = props.filehandler;
     this.youTubeAPI = props.youTubeAPI;
+    this.soundObject.setYoutubeState(this.setParentState);
 
     this.state = {
       value: 'zack hemsey',
@@ -32,6 +33,7 @@ export default class Youtube extends React.Component {
   }
   componentDidMount = async () => {
     this.setState({icon: this.soundObject.getIcon()});
+    console.log(this.state.icon);
     if ((await this.filehandler.loadFile('PlayList')) == null) {
       // console.log("PlayList file doens't exist");
       await this.filehandler.saveFile('PlayList', []);
@@ -47,9 +49,6 @@ export default class Youtube extends React.Component {
           color: '#9EA0A4',
         },
       ]);
-    } else {
-      // console.log('PlayListsNames file exists');
-      // console.log(await this.filehandler.loadFile('PlayListsNames'));
     }
   };
   onChangeText(text) {
@@ -57,26 +56,6 @@ export default class Youtube extends React.Component {
       value: text,
     });
   }
-  startPlayListFrom = (index) => {
-    console.log(index);
-    console.log('startPlayListFrom');
-
-    if (index >= 0 && index < this.state.playlist.length) {
-      this.setState({playListIndex: index});
-      console.log(this.state.currentSong);
-      console.log(this.state.playlist[index]);
-      this.soundObject.playSong(
-        this.state.currentSong,
-        this.state.playlist[index],
-        this.setParentState,
-        this.nextSong,
-      );
-    }
-  };
-  nextSong = () => {
-    console.log('nextsong');
-    this.startPlayListFrom(this.state.playListIndex + 1);
-  };
   addToPlayList = async (item) => {
     let playList = [];
     let temp = await this.filehandler.loadFile();
@@ -99,6 +78,7 @@ export default class Youtube extends React.Component {
   };
 
   setParentState = (data) => {
+    // console.log(data);
     this.setState(data);
   };
 
@@ -188,11 +168,7 @@ export default class Youtube extends React.Component {
             <Button
               icon={this.state.icon}
               style={styles.button}
-              onPress={() =>
-                this.setState(
-                  this.soundObject.handleTrackPlayer(this.state.uri),
-                )
-              }
+              onPress={() => this.soundObject.handleTrackPlayer()}
             />
             <Button
               icon="fast-forward"
@@ -202,12 +178,6 @@ export default class Youtube extends React.Component {
               }
             />
           </View>
-          {/* <Slider
-            value={this.state.trackPosition}
-            onSlidingComplete={this.onSeekSliderSlidingComplete}
-            disabled={this.state.isLoading}
-            maximumValue={this.state.trackLength}
-          /> */}
         </View>
       </View>
     );

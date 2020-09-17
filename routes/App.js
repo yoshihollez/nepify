@@ -6,6 +6,9 @@ import SoundHandler from '../src/SoundHandler';
 import Filehandler from '../src/FileHandler';
 import YouTubeAPI from '../src/YouTubeAPI';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
+import {View, StyleSheet, Dimensions, Text} from 'react-native';
+let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+import {Button, TextInput} from 'react-native-paper';
 
 RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
   (isEnabled) => {
@@ -17,22 +20,6 @@ RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
 let soundObject = new SoundHandler();
 let filehandler = new Filehandler();
 let youTubeAPI = new YouTubeAPI();
-
-const searchSongs = () => (
-  <Youtube
-    soundObject={soundObject}
-    filehandler={filehandler}
-    youTubeAPI={youTubeAPI}
-  />
-);
-
-const playList = () => (
-  <PlayList
-    soundObject={soundObject}
-    filehandler={filehandler}
-    youTubeAPI={youTubeAPI}
-  />
-);
 
 export default class App extends React.Component {
   state = {
@@ -51,11 +38,27 @@ export default class App extends React.Component {
     ],
   };
 
+  searchSongs = () => (
+    <Youtube
+      soundObject={soundObject}
+      filehandler={filehandler}
+      youTubeAPI={youTubeAPI}
+    />
+  );
+
+  playList = () => (
+    <PlayList
+      soundObject={soundObject}
+      filehandler={filehandler}
+      youTubeAPI={youTubeAPI}
+    />
+  );
+
   _handleIndexChange = (index) => this.setState({index});
 
   _renderScene = BottomNavigation.SceneMap({
-    music: searchSongs,
-    playlist: playList,
+    music: this.searchSongs,
+    playlist: this.playList,
   });
 
   render() {

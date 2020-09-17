@@ -12,10 +12,24 @@ export default class SoundHandler {
     this.playListName;
     this.playListIndex = 0;
     this.icon = 'play';
+    this.youtubeState;
+    this.playListState;
   }
   getIcon = () => {
     return this.icon;
   };
+  setYoutubeState = (setState) => {
+    this.youtubeState = setState;
+  };
+  setPlayListState = (setState) => {
+    this.playListState = setState;
+  };
+
+  editParentStates = (data) => {
+    this.youtubeState(data);
+    this.playListState(data);
+  };
+
   playTrack = (uri) => {
     console.log('playtrack');
     if (!this.soundObject.isLoaded()) {
@@ -73,10 +87,12 @@ export default class SoundHandler {
     if (this.soundObject.isPlaying()) {
       this.pauseTrack();
       this.icon = 'play';
+      this.editParentStates({icon: 'play'});
       return {icon: 'play'};
     } else {
       this.playTrack(uri);
       this.icon = 'pause';
+      this.editParentStates({icon: 'pause'});
       return {icon: 'pause'};
     }
   };
@@ -92,11 +108,9 @@ export default class SoundHandler {
         'https://www.youtube.com/watch?v=' + item.key,
       );
       this.unloadTrack();
-      setParentState({
-        icon: this.handleTrackPlayer(this.urls[0].url).icon,
-      });
+      this.handleTrackPlayer(this.urls[0].url);
     } else {
-      return this.handleTrackPlayer();
+      this.handleTrackPlayer();
     }
   };
   getSoundObject = () => {
