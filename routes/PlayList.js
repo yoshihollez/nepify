@@ -17,7 +17,6 @@ import RNPickerSelect from 'react-native-picker-select';
 export default class PlayList extends React.Component {
   constructor(props) {
     super(props);
-    // LogBox.ignoreAllLogs(value);
     this.soundObject = props.soundObject;
     this.filehandler = props.filehandler;
     this.youTubeAPI = props.youTubeAPI;
@@ -27,18 +26,21 @@ export default class PlayList extends React.Component {
       icon: 'play',
       playListName: 'PlayList',
       playList: [],
-      trackLength: 1,
-      trackPosition: 0,
       playListID: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
       refreshing: false,
     };
   }
   componentDidMount = async () => {
+    userSettings = await this.filehandler.getUserSettings();
+    console.log(userSettings);
+
+    this.setState({
+      icon: this.soundObject.getIcon(),
+      playListName: userSettings.playListName,
+    });
     this.setState({icon: this.soundObject.getIcon()});
-    console.log(this.state.icon);
-    playList = await this.filehandler.loadFile();
-    this.soundObject.setPlayList(playList);
-    this.soundObject.setPlayListName(this.state.playListName);
+    console.log(this.state.playListName);
+
     this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
       playList: playList,
@@ -70,8 +72,6 @@ export default class PlayList extends React.Component {
     playList = await this.filehandler.loadFile(this.state.playListName);
     this.soundObject.setPlayList(playList);
     this.soundObject.setPlayListName(this.state.playListName);
-    // console.log(playList);
-    // console.log(this.state.playListName);
     this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
       playList: playList,
@@ -96,6 +96,10 @@ export default class PlayList extends React.Component {
     console.log('setPlayListName');
     this.soundObject.setPlayListName(value);
     await this.setState({playListName: value});
+    this.filehandler.setUserSettings({
+      playListName: value,
+      index: 0,
+    });
     this.refresh();
   };
 

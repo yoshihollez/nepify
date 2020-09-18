@@ -28,11 +28,26 @@ export default class FileHandler {
       console.log(error);
     }
   };
-  deleteFile = async fileName => {
+  deleteFile = async (fileName) => {
     try {
       await AsyncStorage.removeItem(fileName);
     } catch (error) {
       console.log(error);
     }
+  };
+  getUserSettings = async () => {
+    let userSettings = await this.loadFile('UserSettings');
+    if (userSettings == null) {
+      // console.log("PlayListsNames file doens't exist");
+      await this.saveFile('UserSettings', {
+        playListName: 'PlayList',
+        index: 0,
+      });
+    } else {
+      return userSettings;
+    }
+  };
+  setUserSettings = async (data) => {
+    await this.saveFile('UserSettings', data);
   };
 }

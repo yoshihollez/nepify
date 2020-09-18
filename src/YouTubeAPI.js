@@ -36,14 +36,8 @@ export default class YouTubeAPI {
 
     return {results: temp, showCarousel: true};
   };
-  getSongURLS = async (url) => {
-    console.log('getSongURLS');
-
-    console.log(
-      await ytdl(url, {
-        quality: 'highestaudio',
-      }),
-    );
+  getSongURL = async (url) => {
+    console.log('getSongURL');
     return await ytdl(url, {
       quality: 'highestaudio',
     });

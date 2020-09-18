@@ -1,7 +1,10 @@
 var Sound = require('react-native-sound');
 Sound.setCategory('Playback');
 import YouTubeAPI from './YouTubeAPI';
+import FileHandler from './FileHandler';
+
 let youTubeAPI = new YouTubeAPI();
+let fileHandler = new FileHandler();
 
 export default class SoundHandler {
   constructor() {
@@ -18,16 +21,20 @@ export default class SoundHandler {
   getIcon = () => {
     return this.icon;
   };
+  setPlayListIndex = (index) => {
+    this.playListIndex = index;
+  };
   setYoutubeState = (setState) => {
     this.youtubeState = setState;
   };
   setPlayListState = (setState) => {
     this.playListState = setState;
   };
-
   editParentStates = (data) => {
     this.youtubeState(data);
-    this.playListState(data);
+    try {
+      this.playListState(data);
+    } catch (error) {}
   };
 
   playTrack = (uri) => {
@@ -82,18 +89,24 @@ export default class SoundHandler {
       console.log(error);
     }
   };
-  handleTrackPlayer = (uri) => {
+  handleTrackPlayer = async (uri) => {
     console.log('handleTrackPlayer');
     if (this.soundObject.isPlaying()) {
       this.pauseTrack();
       this.icon = 'play';
       this.editParentStates({icon: 'play'});
       return {icon: 'play'};
-    } else {
+    } else if (this.soundObject.isLoaded() || uri != undefined) {
       this.playTrack(uri);
       this.icon = 'pause';
       this.editParentStates({icon: 'pause'});
       return {icon: 'pause'};
+    } else {
+      let songData = await youTubeAPI.getSongURL(
+        'https://www.youtube.com/watch?v=' +
+          this.playList[this.playListIndex].key,
+      );
+      this.handleTrackPlayer(songData[0].url);
     }
   };
   playSong = async (currentSong, item, setParentState, nextSong) => {
@@ -104,7 +117,7 @@ export default class SoundHandler {
     //if statement currently of no use
     if (this.currentSong != item.songName) {
       this.currentSong = item.songName;
-      this.urls = await youTubeAPI.getSongURLS(
+      this.urls = await youTubeAPI.getSongURL(
         'https://www.youtube.com/watch?v=' + item.key,
       );
       this.unloadTrack();
@@ -122,6 +135,9 @@ export default class SoundHandler {
   setPlayListName = (playListName) => {
     this.playListName = playListName;
   };
+  getPlayListName = () => {
+    return this.playListName;
+  };
 
   startPlayListFrom = (index, setParentState) => {
     console.log('startPlayListFrom');
@@ -132,6 +148,11 @@ export default class SoundHandler {
     }
     if (index >= 0 && index < this.playList.length) {
       this.playListIndex = index;
+      console.log(this.playListIndex);
+      fileHandler.setUserSettings({
+        playListName: this.playListName,
+        index: this.playListIndex,
+      });
       this.playSong(
         this.currentSong,
         this.playList[index],

@@ -23,17 +23,17 @@ export default class Youtube extends React.Component {
       value: 'zack hemsey',
       results: [],
       showCarousel: false,
-      uri: '',
       currentSong: '',
       icon: 'play',
-      trackLength: 1,
-      trackPosition: 0,
       playListName: 'PlayList',
     };
   }
   componentDidMount = async () => {
-    this.setState({icon: this.soundObject.getIcon()});
-    console.log(this.state.icon);
+    userSettings = await this.filehandler.getUserSettings();
+    this.setState({
+      icon: this.soundObject.getIcon(),
+      playListName: userSettings.playListName,
+    });
     if ((await this.filehandler.loadFile('PlayList')) == null) {
       // console.log("PlayList file doens't exist");
       await this.filehandler.saveFile('PlayList', []);
@@ -50,6 +50,11 @@ export default class Youtube extends React.Component {
         },
       ]);
     }
+
+    playList = await this.filehandler.loadFile(this.state.playListName);
+    this.soundObject.setPlayList(playList);
+    this.soundObject.setPlayListName(this.state.playListName);
+    this.soundObject.setPlayListIndex(userSettings.index);
   };
   onChangeText(text) {
     this.setState({
@@ -58,7 +63,9 @@ export default class Youtube extends React.Component {
   }
   addToPlayList = async (item) => {
     let playList = [];
-    let temp = await this.filehandler.loadFile();
+    let temp = await this.filehandler.loadFile(
+      this.soundObject.getPlayListName(),
+    );
     console.log('temp');
     console.log(temp);
     if (temp != null) {
@@ -71,7 +78,7 @@ export default class Youtube extends React.Component {
     if (!alreadyContains) {
       console.log('adding');
       playList.push(item);
-      this.filehandler.saveFile(this.state.playListName, playList);
+      this.filehandler.saveFile(this.soundObject.getPlayListName(), playList);
     } else {
       console.log('already contains');
     }
