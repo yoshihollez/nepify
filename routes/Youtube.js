@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import MusicControl from 'react-native-music-control';
 
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 export default class Youtube extends React.Component {
@@ -30,6 +31,17 @@ export default class Youtube extends React.Component {
   }
   componentDidMount = async () => {
     userSettings = await this.filehandler.getUserSettings();
+    console.log(userSettings);
+    if (userSettings.imageURL != undefined) {
+      this.soundObject.setNotification({
+        title: userSettings.songName,
+        artwork: userSettings.imageURL, // URL or RN's image require()
+        artist: userSettings.channel,
+      });
+    } else {
+      MusicControl.resetNowPlaying();
+    }
+
     this.setState({
       icon: this.soundObject.getIcon(),
       playListName: userSettings.playListName,
@@ -124,19 +136,11 @@ export default class Youtube extends React.Component {
                   flexDirection: 'row',
                   paddingRight: screenWidth / 4,
                 }}>
-                <Image style={styles.image} source={{uri: item.videoImg}} />
+                <Image style={styles.image} source={{uri: item.imageURL}} />
                 <TouchableOpacity
-                  onPress={() =>
-                    this.soundObject.playSong(
-                      this.state.currentSong,
-                      item,
-                      this.setParentState,
-                    )
-                  }>
+                  onPress={() => this.soundObject.playSong(item)}>
                   <Text style={styles.item}>
-                    {item.videoTitle
-                      .replace('&quot;', ' ')
-                      .replace('&#39;', "'")}
+                    {item.songName.replace('&quot;', ' ').replace('&#39;', "'")}
                   </Text>
                 </TouchableOpacity>
                 <Button
@@ -148,10 +152,10 @@ export default class Youtube extends React.Component {
                   onPress={() =>
                     this.addToPlayList({
                       key: item.key,
-                      songName: item.videoTitle
+                      songName: item.songName
                         .replace('&quot;', ' ')
                         .replace('&#39;', "'"),
-                      imageURL: item.videoImg,
+                      imageURL: item.imageURL,
                       // artist: item.channel,
                     })
                   }

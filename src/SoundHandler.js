@@ -26,6 +26,7 @@ export default class SoundHandler {
     this.icon = 'play';
     this.youtubeState;
     this.playListState;
+    this.shouldNotificationBeVisible = false;
     MusicControl.on('play', () => {
       this.handleTrackPlayer();
     });
@@ -72,11 +73,6 @@ export default class SoundHandler {
             this.resumeTrack();
           }
         });
-        MusicControl.setNowPlaying({
-          title: this.playList[this.playListIndex].songName,
-          artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-          artist: this.artist,
-        });
       } catch (error) {
         console.log('error');
         console.log(error);
@@ -84,6 +80,13 @@ export default class SoundHandler {
     } else {
       this.resumeTrack();
     }
+    try {
+      this.setNotification({
+        title: this.playList[this.playListIndex].songName,
+        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+        artist: this.playList[this.playListIndex].channel,
+      });
+    } catch (error) {}
   };
   pauseTrack = () => {
     console.log('pauseTrack');
@@ -107,6 +110,15 @@ export default class SoundHandler {
     } catch (error) {
       console.log(error);
     }
+    try {
+      this.setNotification({
+        title: this.playList[this.playListIndex].songName,
+        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+        artist: this.playList[this.playListIndex].channel,
+      });
+    } catch (error) {
+      MusicControl.resetNowPlaying();
+    }
   };
   unloadTrack = () => {
     console.log('unloadTrack');
@@ -123,17 +135,21 @@ export default class SoundHandler {
       this.pauseTrack();
       this.icon = 'play';
       this.editParentStates({icon: 'play'});
-      MusicControl.updatePlayback({
-        state: MusicControl.STATE_PAUSED,
-      });
+      if (this.shouldNotificationBeVisible) {
+        MusicControl.updatePlayback({
+          state: MusicControl.STATE_PAUSED,
+        });
+      }
       return {icon: 'play'};
     } else if (this.soundObject.isLoaded() || uri != undefined) {
       this.playTrack(uri);
       this.icon = 'pause';
       this.editParentStates({icon: 'pause'});
-      MusicControl.updatePlayback({
-        state: MusicControl.STATE_PLAYING,
-      });
+      if (this.shouldNotificationBeVisible) {
+        MusicControl.updatePlayback({
+          state: MusicControl.STATE_PLAYING,
+        });
+      }
       return {icon: 'pause'};
     } else {
       let songData = await youTubeAPI.getSongURL(
@@ -145,6 +161,7 @@ export default class SoundHandler {
   };
   playSong = async (item, nextSong) => {
     console.log('playSong');
+    console.log(item);
     // after update to ytdl full url is now needed
     this.setNextSong = nextSong;
     this.pauseTrack();
@@ -158,6 +175,15 @@ export default class SoundHandler {
       this.handleTrackPlayer(this.urls[0].url);
     } else {
       this.handleTrackPlayer();
+    }
+    try {
+      this.setNotification({
+        title: this.playList[this.playListIndex].songName,
+        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+        artist: this.playList[this.playListIndex].channel,
+      });
+    } catch (error) {
+      MusicControl.resetNowPlaying();
     }
   };
   getSoundObject = () => {
@@ -182,10 +208,12 @@ export default class SoundHandler {
     }
     if (index >= 0 && index < this.playList.length) {
       this.playListIndex = index;
-      console.log(this.playListIndex);
       fileHandler.setUserSettings({
         playListName: this.playListName,
         index: this.playListIndex,
+        songName: this.playList[this.playListIndex].songName,
+        imageURL: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+        channel: this.playList[this.playListIndex].channel,
       });
       this.playSong(this.playList[index], this.nextSong);
     }
@@ -197,5 +225,15 @@ export default class SoundHandler {
   previousSong = () => {
     console.log('nextsong');
     this.startPlayListFrom(this.playListIndex - 1);
+  };
+  setNotification = (settings) => {
+    console.log('setNotification');
+    if (settings.artwork !== undefined) {
+      this.shouldNotificationBeVisible = true;
+      MusicControl.setNowPlaying(settings);
+    } else {
+      this.shouldNotificationBeVisible = false;
+      MusicControl.resetNowPlaying();
+    }
   };
 }

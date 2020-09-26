@@ -43,6 +43,10 @@ export default class FileHandler {
         playListName: 'PlayList',
         index: 0,
       });
+      return {
+        playListName: 'PlayList',
+        index: 0,
+      };
     } else {
       return userSettings;
     }

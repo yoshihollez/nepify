@@ -6,9 +6,6 @@ import SoundHandler from '../src/SoundHandler';
 import Filehandler from '../src/FileHandler';
 import YouTubeAPI from '../src/YouTubeAPI';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
-import {View, StyleSheet, Dimensions, Text} from 'react-native';
-let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
-import {Button, TextInput} from 'react-native-paper';
 
 RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
   (isEnabled) => {
@@ -17,6 +14,7 @@ RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
     }
   },
 );
+
 let soundObject = new SoundHandler();
 let filehandler = new Filehandler();
 let youTubeAPI = new YouTubeAPI();

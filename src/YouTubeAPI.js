@@ -23,8 +23,8 @@ export default class YouTubeAPI {
         for (let index = 0; index < responseJson.items.length; index++) {
           const element = responseJson.items[index];
           temp.push({
-            videoTitle: element.snippet.title.replace('&quot;', ' '),
-            videoImg: element.snippet.thumbnails.medium.url,
+            songName: element.snippet.title.replace('&quot;', ' '),
+            imageURL: element.snippet.thumbnails.medium.url,
             channel: element.snippet.channelTitle,
             key: element.id.videoId,
           });
@@ -68,13 +68,12 @@ export default class YouTubeAPI {
             if (responseJson.nextPageToken) {
               token = responseJson.nextPageToken;
             } else token = false;
-            responseJson.items.forEach((item) => {
+            responseJson.items.forEach((element) => {
               newPlayListArray.push({
-                key: item.snippet.resourceId.videoId,
-                songName: item.snippet.title
-                  .replace('&quot;', ' ')
-                  .replace('&#39;', "'"),
-                imageURL: item.snippet.thumbnails.default.url,
+                key: element.snippet.resourceId.videoId,
+                songName: element.snippet.title.replace('&quot;', ' '),
+                imageURL: element.snippet.thumbnails.medium.url,
+                channel: '',
               });
             });
           })
