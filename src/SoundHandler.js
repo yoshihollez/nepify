@@ -2,21 +2,44 @@ var Sound = require('react-native-sound');
 Sound.setCategory('Playback');
 import YouTubeAPI from './YouTubeAPI';
 import FileHandler from './FileHandler';
+import MusicControl from 'react-native-music-control';
 
 let youTubeAPI = new YouTubeAPI();
 let fileHandler = new FileHandler();
 
 export default class SoundHandler {
   constructor() {
+    // Basic Controls
+    MusicControl.enableControl('play', true);
+    MusicControl.enableControl('pause', true);
+    // MusicControl.enableControl('stop', false);
+    MusicControl.enableControl('nextTrack', true);
+    MusicControl.enableControl('previousTrack', false);
     this.soundObject = new Sound('', null);
     this.setNextSong;
-    this.currentSong = 'leeg';
+    this.currentSong = '';
+    this.songImage = '';
+    this.artist = '';
     this.playList = [];
     this.playListName;
     this.playListIndex = 0;
     this.icon = 'play';
     this.youtubeState;
     this.playListState;
+    MusicControl.on('play', () => {
+      this.handleTrackPlayer();
+    });
+    // on iOS this event will also be triggered by audio router change events
+    // happening when headphones are unplugged or a bluetooth audio peripheral disconnects from the device
+    MusicControl.on('pause', () => {
+      this.handleTrackPlayer();
+    });
+    MusicControl.on('nextTrack', () => {
+      this.nextSong();
+    });
+    MusicControl.on('previousTrack', () => {
+      this.previousSong();
+    });
   }
   getIcon = () => {
     return this.icon;
@@ -48,6 +71,11 @@ export default class SoundHandler {
           } else {
             this.resumeTrack();
           }
+        });
+        MusicControl.setNowPlaying({
+          title: this.playList[this.playListIndex].songName,
+          artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+          artist: this.artist,
         });
       } catch (error) {
         console.log('error');
@@ -95,11 +123,17 @@ export default class SoundHandler {
       this.pauseTrack();
       this.icon = 'play';
       this.editParentStates({icon: 'play'});
+      MusicControl.updatePlayback({
+        state: MusicControl.STATE_PAUSED,
+      });
       return {icon: 'play'};
     } else if (this.soundObject.isLoaded() || uri != undefined) {
       this.playTrack(uri);
       this.icon = 'pause';
       this.editParentStates({icon: 'pause'});
+      MusicControl.updatePlayback({
+        state: MusicControl.STATE_PLAYING,
+      });
       return {icon: 'pause'};
     } else {
       let songData = await youTubeAPI.getSongURL(
@@ -109,7 +143,7 @@ export default class SoundHandler {
       this.handleTrackPlayer(songData[0].url);
     }
   };
-  playSong = async (currentSong, item, setParentState, nextSong) => {
+  playSong = async (item, nextSong) => {
     console.log('playSong');
     // after update to ytdl full url is now needed
     this.setNextSong = nextSong;
@@ -139,7 +173,7 @@ export default class SoundHandler {
     return this.playListName;
   };
 
-  startPlayListFrom = (index, setParentState) => {
+  startPlayListFrom = (index) => {
     console.log('startPlayListFrom');
     if (index == 'next') {
       index = this.playListIndex + 1;
@@ -153,16 +187,15 @@ export default class SoundHandler {
         playListName: this.playListName,
         index: this.playListIndex,
       });
-      this.playSong(
-        this.currentSong,
-        this.playList[index],
-        setParentState,
-        this.nextSong,
-      );
+      this.playSong(this.playList[index], this.nextSong);
     }
   };
   nextSong = () => {
     console.log('nextsong');
     this.startPlayListFrom(this.playListIndex + 1);
+  };
+  previousSong = () => {
+    console.log('nextsong');
+    this.startPlayListFrom(this.playListIndex - 1);
   };
 }
