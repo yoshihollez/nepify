@@ -192,12 +192,7 @@ export default class PlayList extends React.Component {
             <Button
               icon="rewind"
               style={styles.button}
-              onPress={() =>
-                this.soundObject.startPlayListFrom(
-                  'previous',
-                  this.setParentState,
-                )
-              }
+              onPress={() => this.soundObject.startPlayListFrom('previous')}
             />
             <Button
               icon={this.state.icon}
@@ -207,9 +202,7 @@ export default class PlayList extends React.Component {
             <Button
               icon="fast-forward"
               style={styles.button}
-              onPress={() =>
-                this.soundObject.startPlayListFrom('next', this.setParentState)
-              }
+              onPress={() => this.soundObject.startPlayListFrom('next')}
             />
           </View>
         </View>
