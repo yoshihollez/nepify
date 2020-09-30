@@ -2,32 +2,27 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 export default class FileHandler {
   constructor() {}
-  loadPlayListNames = async () => {
-    try {
-      let temp = await AsyncStorage.getItem('PlayListsNames');
-      return JSON.parse(temp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
+  // Loads data from file and returns parsed data.
   loadFile = async (fileName = 'PlayList') => {
     try {
-      // console.log(fileName);
-      let temp = await AsyncStorage.getItem(fileName);
-      // console.log(JSON.parse(temp));
-      return JSON.parse(temp);
+      let fileData = await AsyncStorage.getItem(fileName);
+      return JSON.parse(fileData);
     } catch (error) {
       console.log(error);
     }
   };
+
+  // Save data to file
   saveFile = async (fileName = 'PlayList', data) => {
     try {
-      // console.log(fileName);
       await AsyncStorage.setItem(fileName, JSON.stringify(data));
     } catch (error) {
       console.log(error);
     }
   };
+
+  // Deletes a file.
   deleteFile = async (fileName) => {
     try {
       await AsyncStorage.removeItem(fileName);
@@ -35,6 +30,8 @@ export default class FileHandler {
       console.log(error);
     }
   };
+
+  // return userSettings and if no file UserSettings exists create one
   getUserSettings = async () => {
     let userSettings = await this.loadFile('UserSettings');
     if (userSettings == null) {
@@ -51,6 +48,8 @@ export default class FileHandler {
       return userSettings;
     }
   };
+
+  // Set userSettings
   setUserSettings = async (data) => {
     await this.saveFile('UserSettings', data);
   };
