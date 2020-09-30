@@ -7,6 +7,7 @@ import Filehandler from '../src/FileHandler';
 import YouTubeAPI from '../src/YouTubeAPI';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
 
+// Battery optimization needs to be disabled otherwise app will stop working after few minutes of sleep.
 RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
   (isEnabled) => {
     if (isEnabled) {
@@ -19,6 +20,7 @@ let soundObject = new SoundHandler();
 let filehandler = new Filehandler();
 let youTubeAPI = new YouTubeAPI();
 
+// Default app class that contains navigation to PlayLIst and Youtube routes
 export default class App extends React.Component {
   state = {
     index: 0,
