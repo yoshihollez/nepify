@@ -118,7 +118,7 @@ export default class PlayList extends React.Component {
   render = () => {
     return (
       <View style={styles.container}>
-        <View>
+        <View style={styles.listSelector}>
           <RNPickerSelect
             placeholder={{}}
             onValueChange={async (value) => await this.setPlayListName(value)}
@@ -126,7 +126,7 @@ export default class PlayList extends React.Component {
             items={this.state.playListsNames}
           />
         </View>
-        <View style={{padding: 10}}>
+        <View style={styles.input}>
           <TextInput
             style={{
               height: screenHeight / 32,
@@ -135,7 +135,7 @@ export default class PlayList extends React.Component {
             onChangeText={(text) => this.onChangeText(text)}
           />
         </View>
-        <View style={styles.bottomButtons}>
+        <View style={styles.playListButtons}>
           <TouchableOpacity
             style={{width: screenWidth / 3}}
             onPress={async () => {
@@ -159,11 +159,7 @@ export default class PlayList extends React.Component {
             <Text style={styles.item}>remove playlist</Text>
           </TouchableOpacity>
         </View>
-        <View
-          style={{
-            paddingLeft: 5,
-            height: screenHeight / 1.65,
-          }}>
+        <View style={styles.list}>
           <FlatList
             data={this.state.playList}
             renderItem={({item, index}) => (
@@ -195,24 +191,22 @@ export default class PlayList extends React.Component {
             }
           />
         </View>
-        <View style={styles.bottom}>
-          <View style={styles.bottomButtons}>
-            <Button
-              icon="rewind"
-              style={styles.button}
-              onPress={() => this.soundObject.startPlayListFrom('previous')}
-            />
-            <Button
-              icon={this.state.icon}
-              style={styles.button}
-              onPress={() => this.soundObject.handleTrackPlayer()}
-            />
-            <Button
-              icon="fast-forward"
-              style={styles.button}
-              onPress={() => this.soundObject.startPlayListFrom('next')}
-            />
-          </View>
+        <View style={styles.bottomButtons}>
+          <Button
+            icon="rewind"
+            style={styles.button}
+            onPress={() => this.soundObject.startPlayListFrom('previous')}
+          />
+          <Button
+            icon={this.state.icon}
+            style={styles.button}
+            onPress={() => this.soundObject.handleTrackPlayer()}
+          />
+          <Button
+            icon="fast-forward"
+            style={styles.button}
+            onPress={() => this.soundObject.startPlayListFrom('next')}
+          />
         </View>
       </View>
     );
@@ -225,20 +219,34 @@ const styles = StyleSheet.create({
     paddingTop: screenHeight / 32,
     backgroundColor: '#1A1A1B',
   },
+  listSelector: {
+    alignItems: 'center',
+    flex: 0.75,
+  },
+  input: {
+    padding: 10,
+    flex: 0.5,
+  },
+  playListButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 0.5,
+  },
+  list: {
+    paddingLeft: 5,
+    flex: 6,
+  },
+  bottomButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    flex: 0.5,
+  },
   item: {
     padding: 2,
     fontSize: 18,
     height: screenHeight / 13,
     width: screenWidth / 1.35,
     color: '#ffffff',
-  },
-  bottom: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  bottomButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
   },
   button: {
     width: screenWidth / 3,

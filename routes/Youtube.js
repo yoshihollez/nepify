@@ -103,7 +103,7 @@ export default class Youtube extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={{alignItems: 'center'}}>
+        <View style={styles.input}>
           <TextInput
             style={{
               width: screenWidth / 2,
@@ -122,13 +122,7 @@ export default class Youtube extends React.Component {
             Search
           </Button>
         </View>
-        <View
-          style={{
-            paddingLeft: 5,
-            paddingBottom: 25,
-            paddingTop: 15,
-            height: screenHeight / 1.5,
-          }}>
+        <View style={styles.list}>
           <FlatList
             data={this.state.results}
             renderItem={({item, index}) => (
@@ -196,6 +190,16 @@ const styles = StyleSheet.create({
     paddingTop: screenHeight / 32,
     backgroundColor: '#1A1A1B',
   },
+  input: {
+    alignItems: 'center',
+    flex: 1.5,
+  },
+  list: {
+    paddingLeft: 5,
+    paddingBottom: 25,
+    paddingTop: 15,
+    flex: 3.5,
+  },
   image: {
     width: screenWidth / 8,
     height: screenWidth / 8,
@@ -208,12 +212,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   bottom: {
-    flex: 1,
+    flex: 0.5,
     justifyContent: 'flex-end',
   },
   bottomButtons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-evenly',
   },
   button: {
     width: screenWidth / 3,
