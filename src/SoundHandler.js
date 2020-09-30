@@ -9,16 +9,11 @@ let fileHandler = new FileHandler();
 
 export default class SoundHandler {
   constructor() {
-    // Basic Controls
-    MusicControl.enableControl('play', true);
-    MusicControl.enableControl('pause', true);
-    // MusicControl.enableControl('stop', false);
-    MusicControl.enableControl('nextTrack', true);
-    MusicControl.enableControl('previousTrack', false);
+    // Creates new soudn object
     this.soundObject = new Sound('', null);
+
     this.setNextSong;
     this.currentSong = '';
-    this.songImage = '';
     this.artist = '';
     this.playList = [];
     this.playListName;
@@ -27,6 +22,13 @@ export default class SoundHandler {
     this.youtubeState;
     this.playListState;
     this.shouldNotificationBeVisible = false;
+
+    // Basic Controls for notification
+    MusicControl.enableControl('play', true);
+    MusicControl.enableControl('pause', true);
+    MusicControl.enableControl('nextTrack', true);
+    MusicControl.enableControl('previousTrack', false);
+
     MusicControl.on('play', () => {
       this.handleTrackPlayer();
     });
@@ -42,18 +44,28 @@ export default class SoundHandler {
       this.previousSong();
     });
   }
+
+  // gets current icon
   getIcon = () => {
     return this.icon;
   };
+
+  // sets the playListIndex
   setPlayListIndex = (index) => {
     this.playListIndex = index;
   };
+
+  // sets the youtubeState
   setYoutubeState = (setState) => {
     this.youtubeState = setState;
   };
+
+  // sets the playListState
   setPlayListState = (setState) => {
     this.playListState = setState;
   };
+
+  // sets the parent states
   editParentStates = (data) => {
     this.youtubeState(data);
     try {
@@ -61,6 +73,7 @@ export default class SoundHandler {
     } catch (error) {}
   };
 
+  // plays a song
   playTrack = (uri) => {
     console.log('playtrack');
     if (!this.soundObject.isLoaded()) {
@@ -80,14 +93,9 @@ export default class SoundHandler {
     } else {
       this.resumeTrack();
     }
-    try {
-      this.setNotification({
-        title: this.playList[this.playListIndex].songName,
-        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-        artist: this.playList[this.playListIndex].channel,
-      });
-    } catch (error) {}
   };
+
+  // pauses the current song
   pauseTrack = () => {
     console.log('pauseTrack');
     try {
@@ -96,6 +104,8 @@ export default class SoundHandler {
       console.log(error);
     }
   };
+
+  // resumes the current song
   resumeTrack = () => {
     console.log('resumeTrack');
     try {
@@ -109,15 +119,6 @@ export default class SoundHandler {
       });
     } catch (error) {
       console.log(error);
-    }
-    try {
-      this.setNotification({
-        title: this.playList[this.playListIndex].songName,
-        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-        artist: this.playList[this.playListIndex].channel,
-      });
-    } catch (error) {
-      MusicControl.resetNowPlaying();
     }
   };
   unloadTrack = () => {
@@ -161,11 +162,9 @@ export default class SoundHandler {
   };
   playSong = async (item, nextSong) => {
     console.log('playSong');
-    console.log(item);
     // after update to ytdl full url is now needed
     this.setNextSong = nextSong;
     this.pauseTrack();
-    //if statement currently of no use
     if (this.currentSong != item.songName) {
       this.currentSong = item.songName;
       this.urls = await youTubeAPI.getSongURL(
@@ -176,15 +175,11 @@ export default class SoundHandler {
     } else {
       this.handleTrackPlayer();
     }
-    try {
-      this.setNotification({
-        title: this.playList[this.playListIndex].songName,
-        artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-        artist: this.playList[this.playListIndex].channel,
-      });
-    } catch (error) {
-      MusicControl.resetNowPlaying();
-    }
+    this.setNotification({
+      title: this.playList[this.playListIndex].songName,
+      artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
+      artist: this.playList[this.playListIndex].channel,
+    });
   };
   getSoundObject = () => {
     return this.soundObject;
@@ -227,7 +222,7 @@ export default class SoundHandler {
     this.startPlayListFrom(this.playListIndex - 1);
   };
   setNotification = (settings) => {
-    console.log('setNotification');
+    console.log(settings);
     if (settings.artwork !== undefined) {
       this.shouldNotificationBeVisible = true;
       MusicControl.setNowPlaying(settings);
