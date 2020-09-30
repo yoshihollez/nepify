@@ -121,6 +121,8 @@ export default class SoundHandler {
       console.log(error);
     }
   };
+
+  // stops the current song and unloads it
   unloadTrack = () => {
     console.log('unloadTrack');
     try {
@@ -130,6 +132,8 @@ export default class SoundHandler {
       console.log(error);
     }
   };
+
+  // Handles wether sound object has to pause song or play it
   handleTrackPlayer = async (uri) => {
     console.log('handleTrackPlayer');
     if (this.soundObject.isPlaying()) {
@@ -160,6 +164,8 @@ export default class SoundHandler {
       this.handleTrackPlayer(songData[0].url);
     }
   };
+
+  // plays song
   playSong = async (item, nextSong) => {
     console.log('playSong');
     // after update to ytdl full url is now needed
@@ -181,19 +187,28 @@ export default class SoundHandler {
       artist: this.playList[this.playListIndex].channel,
     });
   };
+
+  // returns sound object
   getSoundObject = () => {
     return this.soundObject;
   };
+
+  // returns playList
   setPlayList = (playList) => {
     this.playList = playList;
   };
+
+  // returns playListName
   setPlayListName = (playListName) => {
     this.playListName = playListName;
   };
+
+  // returns playListName
   getPlayListName = () => {
     return this.playListName;
   };
 
+  // Starts playing songs from a playList at a certain position
   startPlayListFrom = (index) => {
     console.log('startPlayListFrom');
     if (index == 'next') {
@@ -213,16 +228,21 @@ export default class SoundHandler {
       this.playSong(this.playList[index], this.nextSong);
     }
   };
+
+  // plays next song in the playList
   nextSong = () => {
     console.log('nextsong');
     this.startPlayListFrom(this.playListIndex + 1);
   };
+
+  // plays previous song in the playList
   previousSong = () => {
     console.log('nextsong');
     this.startPlayListFrom(this.playListIndex - 1);
   };
+
+  // creates notification or hides it
   setNotification = (settings) => {
-    console.log(settings);
     if (settings.artwork !== undefined) {
       this.shouldNotificationBeVisible = true;
       MusicControl.setNowPlaying(settings);

@@ -9,20 +9,24 @@ export default class YouTubeAPI {
     this.key = API_KEY;
   }
 
+  // searches for youtube videos with a specific search term
   getYoutubeVids = async (searchValue) => {
-    let temp = [];
+    let songs = [];
+    // creates api url
     let url =
       'https://www.googleapis.com/youtube/v3/search?key=' +
       this.key +
       '&part=snippet&q=' +
       searchValue +
       '&maxResults=25&type=video';
+
+    // fetch api data
     await fetch(url)
       .then((response) => response.json())
       .then((responseJson) => {
         for (let index = 0; index < responseJson.items.length; index++) {
           const element = responseJson.items[index];
-          temp.push({
+          songs.push({
             songName: element.snippet.title.replace('&quot;', ' '),
             imageURL: element.snippet.thumbnails.medium.url,
             channel: element.snippet.channelTitle,
@@ -34,19 +38,24 @@ export default class YouTubeAPI {
         console.error(error);
       });
 
-    return {results: temp, showCarousel: true};
+    return {results: songs, showCarousel: true};
   };
+
+  // returns a link to a audio file using a youtube link
   getSongURL = async (url) => {
     console.log('getSongURL');
+    console.log(url);
     return await ytdl(url, {
       quality: 'highestaudio',
     });
   };
 
+  // gets songs from youtube playList and saves them in file
   getYoutubePlayList = async (playListID) => {
     try {
       let newPlayListArray = [];
       let token = '';
+      // api url
       let url =
         'https://www.googleapis.com/youtube/v3/playlistItems?key=' +
         this.key +
@@ -54,6 +63,7 @@ export default class YouTubeAPI {
         playListID +
         '&pageToken=' +
         token;
+      // only 50 songs can be requested per call so tokens are needed
       do {
         url =
           'https://www.googleapis.com/youtube/v3/playlistItems?key=' +
@@ -82,7 +92,7 @@ export default class YouTubeAPI {
           });
       } while (token);
 
-      let playListNames = await filehandler.loadPlayListNames();
+      let playListNames = await filehandler.loadFile('PlayListsNames');
 
       let bool = false;
       for (let index = 0; index < playListNames.length; index++) {
@@ -102,6 +112,7 @@ export default class YouTubeAPI {
           return responseJson.items[0].snippet.localized.title;
         });
 
+      // save new playList name inside PlayListsNames file and save the new playList
       if (!bool) {
         playListNames.push({
           value: playListName,
@@ -113,7 +124,6 @@ export default class YouTubeAPI {
         filehandler.saveFile('PlayListsNames', playListNames);
         filehandler.saveFile(playListName, newPlayListArray);
       }
-      //  PL3AStYGqDKPyIkNTdHy9gEf35CNDKgL6b
     } catch (error) {
       console.log(error);
     }

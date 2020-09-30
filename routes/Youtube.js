@@ -9,7 +9,6 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import MusicControl from 'react-native-music-control';
 
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 export default class Youtube extends React.Component {
@@ -18,10 +17,11 @@ export default class Youtube extends React.Component {
     this.soundObject = props.soundObject;
     this.filehandler = props.filehandler;
     this.youTubeAPI = props.youTubeAPI;
+    // TODO find better way of implementing this
     this.soundObject.setYoutubeState(this.setParentState);
 
     this.state = {
-      value: 'zack hemsey',
+      youTubeSearchTerm: 'zack hemsey',
       results: [],
       showCarousel: false,
       currentSong: '',
@@ -30,26 +30,24 @@ export default class Youtube extends React.Component {
     };
   }
   componentDidMount = async () => {
+    // Gets the last played song, wich playlist was selected last
     userSettings = await this.filehandler.getUserSettings();
-    console.log(userSettings);
-    if (userSettings.imageURL != undefined) {
-      this.soundObject.setNotification({
-        title: userSettings.songName,
-        artwork: userSettings.imageURL, // URL or RN's image require()
-        artist: userSettings.channel,
-      });
-    } else {
-      MusicControl.resetNowPlaying();
-    }
-
+    // If there was no song being played from a playlist there will be no notifcation to resume.
+    this.soundObject.setNotification({
+      title: userSettings.songName,
+      artwork: userSettings.imageURL, // URL or RN's image require()
+      artist: userSettings.channel,
+    });
     this.setState({
       icon: this.soundObject.getIcon(),
       playListName: userSettings.playListName,
     });
+    // This is for the first time the app is started. A file named PlayList will be made.
     if ((await this.filehandler.loadFile('PlayList')) == null) {
       // console.log("PlayList file doens't exist");
       await this.filehandler.saveFile('PlayList', []);
     }
+    // This is for the first time the app is started. A file named PlayListsNames will be made where all playList names will be stored in.
     if ((await this.filehandler.loadFile('PlayListsNames')) == null) {
       // console.log("PlayListsNames file doens't exist");
       await this.filehandler.saveFile('PlayListsNames', [
@@ -68,27 +66,28 @@ export default class Youtube extends React.Component {
     this.soundObject.setPlayListName(this.state.playListName);
     this.soundObject.setPlayListIndex(userSettings.index);
   };
+
   onChangeText(text) {
     this.setState({
-      value: text,
+      youTubeSearchTerm: text,
     });
   }
+
+  // Adds songs to the playList
   addToPlayList = async (item) => {
     let playList = [];
     let temp = await this.filehandler.loadFile(
       this.soundObject.getPlayListName(),
     );
-    console.log('temp');
-    console.log(temp);
     if (temp != null) {
       playList = temp;
     }
+
+    // checks if song is already in playlist
     const alreadyContains = playList.some(
       (element) => element.key === item.key,
     );
-
     if (!alreadyContains) {
-      console.log('adding');
       playList.push(item);
       this.filehandler.saveFile(this.soundObject.getPlayListName(), playList);
     } else {
@@ -96,8 +95,8 @@ export default class Youtube extends React.Component {
     }
   };
 
+  // Set the state from a child element
   setParentState = (data) => {
-    // console.log(data);
     this.setState(data);
   };
 
@@ -115,7 +114,9 @@ export default class Youtube extends React.Component {
             icon="search-web"
             onPress={async () =>
               this.setState(
-                await this.youTubeAPI.getYoutubeVids(this.state.value),
+                await this.youTubeAPI.getYoutubeVids(
+                  this.state.youTubeSearchTerm,
+                ),
               )
             }>
             Search
@@ -187,6 +188,8 @@ export default class Youtube extends React.Component {
     );
   }
 }
+
+// CSS
 const styles = StyleSheet.create({
   container: {
     flex: 1,

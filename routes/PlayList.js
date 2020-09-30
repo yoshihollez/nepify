@@ -14,12 +14,14 @@ import {
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from 'react-native-picker-select';
 
+// PlayList class
 export default class PlayList extends React.Component {
   constructor(props) {
     super(props);
     this.soundObject = props.soundObject;
     this.filehandler = props.filehandler;
     this.youTubeAPI = props.youTubeAPI;
+    // TODO find better way of implementing this
     this.soundObject.setPlayListState(this.setParentState);
     this.state = {
       playListsNames: [{label: 'test', value: 'PlayList'}],
@@ -30,45 +32,43 @@ export default class PlayList extends React.Component {
       refreshing: false,
     };
   }
+
   componentDidMount = async () => {
+    // Gets the last played song, wich playlist was selected last
     userSettings = await this.filehandler.getUserSettings();
-    console.log(userSettings);
 
     this.setState({
       icon: this.soundObject.getIcon(),
       playListName: userSettings.playListName,
-    });
-    this.setState({icon: this.soundObject.getIcon()});
-    console.log(this.state.playListName);
-
-    this.setState({
       playListsNames: await this.filehandler.loadFile('PlayListsNames'),
-      playList: playList,
     });
   };
+
+  // Set the state from a child element
   setParentState = (data) => {
-    // console.log(data);
     this.setState(data);
   };
-  removeFromPlayList = async (index, playListName) => {
-    let playList = await this.filehandler.loadFile(playListName);
+
+  // Removes a song from the currently selected playList
+  removeFromPlayList = async (index) => {
+    let playList = await this.filehandler.loadFile(this.state.playListName);
     playList.splice(index, 1);
     this.soundObject.setPlayList(playList);
-    this.saveFile(playListName, playList);
-  };
-  saveFile = async (playListName, data) => {
-    this.filehandler.saveFile(playListName, data);
+    this.filehandler.saveFile(this.state.playListName, playList);
     this.setState({
-      playList: await this.filehandler.loadFile(playListName),
+      playList: await this.filehandler.loadFile(this.state.playListName),
     });
   };
+
+  // Sets the playListID
   onChangeText(text) {
     this.setState({
       playListID: text,
     });
   }
+
+  // Refreshes the playList and PlayListsNames
   refresh = async () => {
-    console.log('refresh');
     playList = await this.filehandler.loadFile(this.state.playListName);
     this.soundObject.setPlayList(playList);
     this.soundObject.setPlayListName(this.state.playListName);
@@ -77,35 +77,44 @@ export default class PlayList extends React.Component {
       playList: playList,
     });
   };
+
+  // Removes a playList
   removePlayList = async (playListName) => {
     for (let index = 0; index < this.state.playListsNames.length; index++) {
       const element = this.state.playListsNames[index].value;
+      // Trying to delete default PlayList will result in emptying it
       if (element == playListName && playListName != 'PlayList') {
         let data = this.state.playListsNames;
         data.splice(index, 1);
-        this.setState({playListsNames: data});
+        this.setState({
+          playListsNames: data,
+        });
+        await this.filehandler.deleteFile(this.state.playListName);
         await this.filehandler.saveFile('PlayListsNames', data);
+      } else if (playListName == 'PlayList') {
+        await this.filehandler.saveFile('PlayList', []);
       }
     }
   };
+
+  // Shuffles the playList
+  // refreshing after shuffle will return it to original
   shufflePlayList = (array) => {
     array.sort(() => Math.random() - 0.5);
     this.setState({playList: array});
   };
-  setPlayListName = async (value) => {
-    console.log('setPlayListName');
-    this.soundObject.setPlayListName(value);
-    await this.setState({playListName: value});
+
+  // Sets the new playList then updates the userSettings and refreshes the flatlist with the new playList songs
+  setPlayListName = async (playListName) => {
+    this.soundObject.setPlayListName(playListName);
+    this.setState({playListName: playListName});
     this.filehandler.setUserSettings({
-      playListName: value,
+      playListName: playListName,
       index: 0,
     });
     this.refresh();
   };
 
-  onRefresh() {
-    this.refresh;
-  }
   render = () => {
     return (
       <View style={styles.container}>
@@ -146,7 +155,6 @@ export default class PlayList extends React.Component {
             style={{width: screenWidth / 3}}
             onPress={async () => {
               this.removePlayList(this.state.playListName);
-              this.filehandler.deleteFile(this.state.playListName);
             }}>
             <Text style={styles.item}>remove playlist</Text>
           </TouchableOpacity>
@@ -210,6 +218,7 @@ export default class PlayList extends React.Component {
     );
   };
 }
+// CSS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
