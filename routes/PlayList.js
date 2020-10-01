@@ -9,7 +9,6 @@ import {
   View,
   FlatList,
   RefreshControl,
-  ScrollView,
 } from 'react-native';
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from 'react-native-picker-select';
@@ -28,7 +27,7 @@ export default class PlayList extends React.Component {
       icon: 'play',
       playListName: 'PlayList',
       playList: [],
-      playListID: 'PL3AStYGqDKPzovoq8mTjpIS-w9ijoLhNf',
+      playListID: '',
       refreshing: false,
     };
   }

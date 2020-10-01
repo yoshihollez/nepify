@@ -78,6 +78,10 @@ export default class YouTubeAPI {
             if (responseJson.nextPageToken) {
               token = responseJson.nextPageToken;
             } else token = false;
+            if (responseJson.error.code == 404) {
+              alert('Playlist not found.');
+              throw 'Playlist not found.';
+            }
             responseJson.items.forEach((element) => {
               newPlayListArray.push({
                 key: element.snippet.resourceId.videoId,
@@ -86,9 +90,6 @@ export default class YouTubeAPI {
                 channel: '',
               });
             });
-          })
-          .catch((error) => {
-            console.error(error);
           });
       } while (token);
 
@@ -109,6 +110,7 @@ export default class YouTubeAPI {
       playListName = await fetch(urlForPlayListName)
         .then((response) => response.json())
         .then((responseJson) => {
+          console.log('hold up');
           return responseJson.items[0].snippet.localized.title;
         });
 
