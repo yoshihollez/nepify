@@ -128,16 +128,14 @@ export default class PlayList extends React.Component {
         </View>
         <View style={styles.input}>
           <TextInput
-            style={{
-              height: screenHeight / 32,
-            }}
+            style={styles.textInput}
             placeholder={'Enter youtube playlist id here.'}
             onChangeText={(text) => this.onChangeText(text)}
           />
         </View>
         <View style={styles.playListButtons}>
           <TouchableOpacity
-            style={{width: screenWidth / 3}}
+            style={styles.button}
             onPress={async () => {
               await this.youTubeAPI.getYoutubePlayList(this.state.playListID),
                 this.refresh();
@@ -145,14 +143,14 @@ export default class PlayList extends React.Component {
             <Text style={styles.item}>add playlist</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{width: screenWidth / 3}}
+            style={styles.button}
             onPress={async () => {
               this.shufflePlayList(this.state.playList);
             }}>
             <Text style={styles.item}>shuffle</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{width: screenWidth / 3}}
+            style={styles.button}
             onPress={async () => {
               this.removePlayList(this.state.playListName);
             }}>
@@ -167,14 +165,11 @@ export default class PlayList extends React.Component {
                 onPress={() =>
                   this.soundObject.startPlayListFrom(index, this.setParentState)
                 }
-                style={{flexDirection: 'row'}}>
+                style={styles.flatList}>
                 <Image style={styles.image} source={{uri: item.imageURL}} />
                 <Text style={styles.item}>{item.songName}</Text>
                 <Button
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                  }}
+                  style={styles.removeFromPlayListButton}
                   icon="playlist-remove"
                   onPress={() =>
                     this.removeFromPlayList(index, this.state.playListName)
@@ -216,30 +211,34 @@ export default class PlayList extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: screenHeight / 32,
+    paddingTop: screenHeight / 32 - 10,
     backgroundColor: '#1A1A1B',
   },
   listSelector: {
     alignItems: 'center',
-    flex: 0.75,
+    flex: 0.06,
   },
   input: {
-    padding: 10,
-    flex: 0.5,
+    paddingTop: 10,
+    flex: 0.06,
   },
   playListButtons: {
     flexDirection: 'row',
     justifyContent: 'center',
-    flex: 0.5,
+    flex: 0.06,
   },
   list: {
     paddingLeft: 5,
-    flex: 6,
+    paddingBottom: 10,
+    flex: 0.76,
+  },
+  flatList: {
+    flexDirection: 'row',
   },
   bottomButtons: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    flex: 0.5,
+    flex: 0.06,
   },
   item: {
     padding: 2,
@@ -254,5 +253,12 @@ const styles = StyleSheet.create({
   image: {
     width: screenWidth / 8,
     height: screenWidth / 8,
+  },
+  removeFromPlayListButton: {
+    position: 'absolute',
+    right: 0,
+  },
+  textInput: {
+    height: screenHeight / 32,
   },
 });

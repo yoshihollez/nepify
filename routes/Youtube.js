@@ -105,9 +105,7 @@ export default class Youtube extends React.Component {
       <View style={styles.container}>
         <View style={styles.input}>
           <TextInput
-            style={{
-              width: screenWidth / 2,
-            }}
+            style={styles.textInput}
             onChangeText={(text) => this.onChangeText(text)}
           />
           <Button
@@ -126,23 +124,15 @@ export default class Youtube extends React.Component {
           <FlatList
             data={this.state.results}
             renderItem={({item, index}) => (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingRight: screenWidth / 4,
-                }}>
+              <TouchableOpacity
+                onPress={() => this.soundObject.playSong(item)}
+                style={styles.flatList}>
                 <Image style={styles.image} source={{uri: item.imageURL}} />
-                <TouchableOpacity
-                  onPress={() => this.soundObject.playSong(item)}>
-                  <Text style={styles.item}>
-                    {item.songName.replace('&quot;', ' ').replace('&#39;', "'")}
-                  </Text>
-                </TouchableOpacity>
+                <Text style={styles.item}>
+                  {item.songName.replace('&quot;', ' ').replace('&#39;', "'")}
+                </Text>
                 <Button
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                  }}
+                  style={styles.addToPlayListButton}
                   icon="playlist-plus"
                   onPress={() =>
                     this.addToPlayList({
@@ -155,28 +145,26 @@ export default class Youtube extends React.Component {
                     })
                   }
                 />
-              </View>
+              </TouchableOpacity>
             )}
           />
         </View>
-        <View style={styles.bottom}>
-          <View style={styles.bottomButtons}>
-            <Button
-              icon="rewind"
-              style={styles.button}
-              onPress={() => this.soundObject.startPlayListFrom('previous')}
-            />
-            <Button
-              icon={this.state.icon}
-              style={styles.button}
-              onPress={() => this.soundObject.handleTrackPlayer()}
-            />
-            <Button
-              icon="fast-forward"
-              style={styles.button}
-              onPress={() => this.soundObject.startPlayListFrom('next')}
-            />
-          </View>
+        <View style={styles.bottomButtons}>
+          <Button
+            icon="rewind"
+            style={styles.button}
+            onPress={() => this.soundObject.startPlayListFrom('previous')}
+          />
+          <Button
+            icon={this.state.icon}
+            style={styles.button}
+            onPress={() => this.soundObject.handleTrackPlayer()}
+          />
+          <Button
+            icon="fast-forward"
+            style={styles.button}
+            onPress={() => this.soundObject.startPlayListFrom('next')}
+          />
         </View>
       </View>
     );
@@ -192,13 +180,15 @@ const styles = StyleSheet.create({
   },
   input: {
     alignItems: 'center',
-    flex: 1.5,
+    flex: 0.18,
   },
   list: {
     paddingLeft: 5,
-    paddingBottom: 25,
-    paddingTop: 15,
-    flex: 3.5,
+    paddingBottom: 10,
+    flex: 0.76,
+  },
+  textInput: {
+    width: screenWidth / 2,
   },
   image: {
     width: screenWidth / 8,
@@ -211,13 +201,17 @@ const styles = StyleSheet.create({
     width: screenWidth / 1.35,
     color: '#FFFFFF',
   },
-  bottom: {
-    flex: 0.5,
-    justifyContent: 'flex-end',
+  flatList: {
+    flexDirection: 'row',
   },
   bottomButtons: {
-    flexDirection: 'row',
+    flex: 0.06,
     justifyContent: 'space-evenly',
+    flexDirection: 'row',
+  },
+  addToPlayListButton: {
+    position: 'absolute',
+    right: 0,
   },
   button: {
     width: screenWidth / 3,
