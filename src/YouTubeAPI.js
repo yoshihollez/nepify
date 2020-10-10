@@ -51,11 +51,22 @@ export default class YouTubeAPI {
   };
 
   // gets songs from youtube playList and saves them in file
-  getYoutubePlayList = async (playListID) => {
+  getYoutubePlayList = async (userInput) => {
     try {
       let newPlayListArray = [];
       let token = '';
+      let playListID = '';
       // api url
+
+      if (userInput.includes('https://www.youtube.com/playlist?list=')) {
+        playListID = userInput.replace(
+          'https://www.youtube.com/playlist?list=',
+          '',
+        );
+      } else {
+        playListID = userInput;
+      }
+      console.log(playListID);
       let url =
         'https://www.googleapis.com/youtube/v3/playlistItems?key=' +
         this.key +
@@ -78,7 +89,10 @@ export default class YouTubeAPI {
             if (responseJson.nextPageToken) {
               token = responseJson.nextPageToken;
             } else token = false;
-            if (responseJson.error.code == 404) {
+            if (
+              responseJson.error != undefined &&
+              responseJson.error.code == 404
+            ) {
               alert('Playlist not found.');
               throw 'Playlist not found.';
             }
@@ -110,7 +124,6 @@ export default class YouTubeAPI {
       playListName = await fetch(urlForPlayListName)
         .then((response) => response.json())
         .then((responseJson) => {
-          console.log('hold up');
           return responseJson.items[0].snippet.localized.title;
         });
 
