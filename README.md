@@ -36,4 +36,4 @@ The build apk for android is stored in `nepify/android/app/release/`.
 
 ## Demo
 
-![Demo of the app.](demo.gif 'demo')
+<img src="./demo.gif" width="350" height="750"/>
