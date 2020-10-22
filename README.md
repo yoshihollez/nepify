@@ -33,3 +33,7 @@ After that you can use `npm start` or `react-native start` to start the developm
 ## Deployment
 
 The build apk for android is stored in `nepify/android/app/release/`.
+
+## Demo
+
+![Demo of the app.](demo.gif 'demo')
