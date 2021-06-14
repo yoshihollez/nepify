@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Button, TextInput} from 'react-native-paper';
 import {
   Dimensions,
@@ -13,197 +13,163 @@ import {
 let {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 import RNPickerSelect from 'react-native-picker-select';
 
-// PlayList class
-export default class PlayList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.soundObject = props.soundObject;
-    this.filehandler = props.filehandler;
-    this.youTubeAPI = props.youTubeAPI;
-    // TODO find better way of implementing this
-    this.soundObject.setPlayListState(this.setParentState);
-    this.state = {
-      playListsNames: [{label: 'test', value: 'PlayList'}],
-      playListName: 'PlayList',
-      playList: [],
-      playListID: '',
-      refreshing: false,
-    };
-  }
+// PlayList function
+export default function PlayList(props) {
+  soundObject = props.soundObject;
+  filehandler = props.filehandler;
+  youTubeAPI = props.youTubeAPI;
 
-  componentDidMount = async () => {
+  const [playListsNames, setPlayListsNames] = useState([
+    {label: 'test', value: 'PlayList'},
+  ]);
+  const [playListName, setPlayListName] = useState('PlayList');
+  const [playList, setPlayList] = useState([]);
+  const [playListID, setPlayListID] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
     // Gets the last played song, wich playlist was selected last
-    userSettings = await this.filehandler.getUserSettings();
-
-    this.setState({
-      icon: this.soundObject.getIcon(),
-      playListName: userSettings.playListName,
-      playListsNames: await this.filehandler.loadFile('PlayListsNames'),
-    });
-  };
+    async function fetchData() {
+      userSettings = await filehandler.getUserSettings();
+      setPlayListName(userSettings.playListName);
+      setPlayListsNames(await filehandler.loadFile('PlayListsNames'));
+    }
+    fetchData();
+  }, []); //notice the empty array here
 
   // Set the state from a child element
-  setParentState = (data) => {
-    this.setState(data);
-  };
+  // const setParentState = (data) => {
+  //   setState(data);
+  // };
 
   // Removes a song from the currently selected playList
-  removeFromPlayList = async (index) => {
-    let playList = await this.filehandler.loadFile(this.state.playListName);
+  const removeFromPlayList = async (index) => {
+    let playList = await filehandler.loadFile(playListName);
     playList.splice(index, 1);
-    this.soundObject.setPlayList(playList);
-    this.filehandler.saveFile(this.state.playListName, playList);
-    this.setState({
-      playList: await this.filehandler.loadFile(this.state.playListName),
-    });
+    soundObject.setPlayList(playList);
+    filehandler.saveFile(playListName, playList);
+    setPlayList(playList);
   };
 
   // Sets the playListID
-  onChangeText(text) {
-    this.setState({
-      playListID: text,
-    });
-  }
+  const onChangeText = (text) => {
+    setPlayListID(text);
+  };
 
   // Refreshes the playList and PlayListsNames
-  refresh = async () => {
-    playList = await this.filehandler.loadFile(this.state.playListName);
-    this.soundObject.setPlayList(playList);
-    this.soundObject.setPlayListName(this.state.playListName);
-    this.setState({
-      playListsNames: await this.filehandler.loadFile('PlayListsNames'),
-      playList: playList,
-    });
+  const refresh = async () => {
+    playListArray = await filehandler.loadFile(playListName);
+    soundObject.setPlayList(playListArray);
+    soundObject.setPlayListName(playListName);
+    setPlayListsNames(await filehandler.loadFile('PlayListsNames'));
+    setPlayList(playListArray);
   };
 
   // Removes a playList
-  removePlayList = async (playListName) => {
-    for (let index = 0; index < this.state.playListsNames.length; index++) {
-      const element = this.state.playListsNames[index].value;
+  const removePlayList = async (playListName) => {
+    for (let index = 0; index < playListsNames.length; index++) {
+      const element = playListsNames[index].value;
       // Trying to delete default PlayList will result in emptying it
       if (element == playListName && playListName != 'PlayList') {
-        let data = this.state.playListsNames;
+        let data = playListsNames;
         data.splice(index, 1);
-        this.setState({
-          playListsNames: data,
-        });
-        await this.filehandler.deleteFile(this.state.playListName);
-        await this.filehandler.saveFile('PlayListsNames', data);
+        setPlayListsNames(data);
+
+        await filehandler.deleteFile(playListName);
+        await filehandler.saveFile('PlayListsNames', data);
       } else if (playListName == 'PlayList') {
-        await this.filehandler.saveFile('PlayList', []);
+        await filehandler.saveFile('PlayList', []);
       }
     }
   };
 
   // Shuffles the playList
   // refreshing after shuffle will return it to original
-  shufflePlayList = (array) => {
+  const shufflePlayList = (array) => {
     array.sort(() => Math.random() - 0.5);
-    this.setState({playList: array});
+    setPlayList(array);
   };
 
   // Sets the new playList then updates the userSettings and refreshes the flatlist with the new playList songs
-  setPlayListName = async (playListName) => {
-    this.soundObject.setPlayListName(playListName);
-    this.setState({playListName: playListName});
-    this.filehandler.setUserSettings({
+  const handlePlayList = (playListName) => {
+    soundObject.setPlayListName(playListName);
+    setPlayListName(playListName);
+    filehandler.setUserSettings({
       playListName: playListName,
       index: 0,
     });
-    this.refresh();
+    refresh();
   };
 
-  render = () => {
-    return (
-      <View style={styles.container}>
-        <View style={styles.listSelector}>
-          <RNPickerSelect
-            placeholder={{}}
-            onValueChange={async (value) => await this.setPlayListName(value)}
-            value={this.state.playListName}
-            items={this.state.playListsNames}
-          />
-        </View>
-        <View style={styles.input}>
-          <TextInput
-            style={styles.textInput}
-            placeholder={'Enter youtube playlist id here.'}
-            onChangeText={(text) => this.onChangeText(text)}
-          />
-        </View>
-        <View style={styles.playListButtons}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={async () => {
-              await this.youTubeAPI.getYoutubePlayList(this.state.playListID),
-                this.refresh();
-            }}>
-            <Text style={styles.item}>add playlist</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={async () => {
-              this.shufflePlayList(this.state.playList);
-            }}>
-            <Text style={styles.item}>shuffle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={async () => {
-              this.removePlayList(this.state.playListName);
-            }}>
-            <Text style={styles.item}>remove playlist</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.list}>
-          <FlatList
-            data={this.state.playList}
-            renderItem={({item, index}) => (
-              <TouchableOpacity
-                onPress={() =>
-                  this.soundObject.startPlayListFrom(index, this.setParentState)
-                }
-                style={styles.flatList}>
-                <Image style={styles.image} source={{uri: item.imageURL}} />
-                <Text style={styles.item}>{item.songName}</Text>
-                <Button
-                  style={styles.removeFromPlayListButton}
-                  icon="playlist-remove"
-                  onPress={() =>
-                    this.removeFromPlayList(index, this.state.playListName)
-                  }
-                />
-              </TouchableOpacity>
-            )}
-            refreshControl={
-              <RefreshControl
-                //refresh control used for the Pull to Refresh
-                refreshing={this.state.refreshing}
-                onRefresh={this.refresh}
-              />
-            }
-          />
-        </View>
-        {/* <View style={styles.bottomButtons}>
-          <Button
-            icon="rewind"
-            style={styles.button}
-            onPress={() => this.soundObject.startPlayListFrom('previous')}
-          />
-          <Button
-            icon={this.state.icon}
-            style={styles.button}
-            onPress={() => this.soundObject.handleTrackPlayer()}
-          />
-          <Button
-            icon="fast-forward"
-            style={styles.button}
-            onPress={() => this.soundObject.startPlayListFrom('next')}
-          />
-        </View> */}
+  return (
+    <View style={styles.container}>
+      <View style={styles.listSelector}>
+        <RNPickerSelect
+          placeholder={{}}
+          onValueChange={(value) => handlePlayList(value)}
+          value={playListName}
+          items={playListsNames}
+        />
       </View>
-    );
-  };
+      <View style={styles.input}>
+        <TextInput
+          style={styles.textInput}
+          placeholder={'Enter youtube playlist id here.'}
+          onChangeText={(text) => onChangeText(text)}
+        />
+      </View>
+      <View style={styles.playListButtons}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            await youTubeAPI.getYoutubePlayList(playListID), refresh();
+          }}>
+          <Text style={styles.item}>add playlist</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            shufflePlayList(playList);
+          }}>
+          <Text style={styles.item}>shuffle</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            removePlayList(playListName);
+          }}>
+          <Text style={styles.item}>remove playlist</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.list}>
+        <FlatList
+          data={playList}
+          renderItem={({item, index}) => (
+            <TouchableOpacity
+              onPress={() =>
+                soundObject.startPlayListFrom(index, setParentState)
+              }
+              style={styles.flatList}>
+              <Image style={styles.image} source={{uri: item.imageURL}} />
+              <Text style={styles.item}>{item.songName}</Text>
+              <Button
+                style={styles.removeFromPlayListButton}
+                icon="playlist-remove"
+                onPress={() => removeFromPlayList(index, playListName)}
+              />
+            </TouchableOpacity>
+          )}
+          refreshControl={
+            <RefreshControl
+              //refresh control used for the Pull to Refresh
+              refreshing={refreshing}
+              onRefresh={refresh}
+            />
+          }
+        />
+      </View>
+    </View>
+  );
 }
 // CSS
 const styles = StyleSheet.create({
