@@ -24,7 +24,6 @@ export default class PlayList extends React.Component {
     this.soundObject.setPlayListState(this.setParentState);
     this.state = {
       playListsNames: [{label: 'test', value: 'PlayList'}],
-      icon: 'play',
       playListName: 'PlayList',
       playList: [],
       playListID: '',
@@ -185,7 +184,7 @@ export default class PlayList extends React.Component {
             }
           />
         </View>
-        <View style={styles.bottomButtons}>
+        {/* <View style={styles.bottomButtons}>
           <Button
             icon="rewind"
             style={styles.button}
@@ -201,7 +200,7 @@ export default class PlayList extends React.Component {
             style={styles.button}
             onPress={() => this.soundObject.startPlayListFrom('next')}
           />
-        </View>
+        </View> */}
       </View>
     );
   };

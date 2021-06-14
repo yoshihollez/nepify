@@ -25,7 +25,6 @@ export default class Youtube extends React.Component {
       results: [],
       showCarousel: false,
       currentSong: '',
-      icon: 'play',
       playListName: 'PlayList',
     };
   }
@@ -149,7 +148,7 @@ export default class Youtube extends React.Component {
             )}
           />
         </View>
-        <View style={styles.bottomButtons}>
+        {/* <View style={styles.bottomButtons}>
           <Button
             icon="rewind"
             style={styles.button}
@@ -165,7 +164,7 @@ export default class Youtube extends React.Component {
             style={styles.button}
             onPress={() => this.soundObject.startPlayListFrom('next')}
           />
-        </View>
+        </View> */}
       </View>
     );
   }
