@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {TextInput, Button} from 'react-native-paper';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  setPlayList,
+  setPlayListName,
+  setPlayListsNames,
+} from '../src/PlayListSlice';
+
 import {
   StyleSheet,
   Text,
@@ -18,7 +25,8 @@ export default function Youtube(props) {
 
   const [youTubeSearchTerm, setYouTubeSearchTerm] = useState('zack hemsey');
   const [results, setResults] = useState([]);
-  const [playListName, setPlayListName] = useState('PlayList');
+  const playListName = useSelector((state) => state.playList.playListName);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Gets the last played song, wich playlist was selected last
@@ -31,7 +39,7 @@ export default function Youtube(props) {
         artwork: userSettings.imageURL, // URL or RN's image require()
         artist: userSettings.channel,
       });
-      setPlayListName(userSettings.playListName);
+      dispatch(setPlayListName(userSettings.playListName));
       // This is for the first time the app is started. A file named PlayList will be made.
       if ((await filehandler.loadFile('PlayList')) == null) {
         // console.log("PlayList file doens't exist");
@@ -52,17 +60,14 @@ export default function Youtube(props) {
       }
 
       playList = await filehandler.loadFile(playListName);
-      soundObject.setPlayList(playList);
-      soundObject.setPlayListName(playListName);
+      dispatch(setPlayList(playList));
       soundObject.setPlayListIndex(userSettings.index);
     }
     fetchData();
   }, []); //notice the empty array here
 
   onChangeText = (text) => {
-    setState({
-      youTubeSearchTerm: text,
-    });
+    setYouTubeSearchTerm(text);
   };
 
   // Adds songs to the playList
@@ -95,7 +100,7 @@ export default function Youtube(props) {
         <Button
           icon="search-web"
           onPress={async () =>
-            setState(await youTubeAPI.getYoutubeVids(youTubeSearchTerm))
+            setResults(await youTubeAPI.getYoutubeVids(youTubeSearchTerm))
           }>
           Search
         </Button>

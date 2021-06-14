@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import {Button, TextInput} from 'react-native-paper';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  setPlayList,
+  setPlayListName,
+  setPlayListsNames,
+} from '../src/PlayListSlice';
 import {
   Dimensions,
   Image,
@@ -19,36 +25,32 @@ export default function PlayList(props) {
   filehandler = props.filehandler;
   youTubeAPI = props.youTubeAPI;
 
-  const [playListsNames, setPlayListsNames] = useState([
-    {label: 'test', value: 'PlayList'},
-  ]);
-  const [playListName, setPlayListName] = useState('PlayList');
-  const [playList, setPlayList] = useState([]);
+  const playList = useSelector((state) => state.playList.playList);
+  const playListName = useSelector((state) => state.playList.playListName);
+  const playListsNames = useSelector((state) => state.playList.playListsNames);
+
   const [playListID, setPlayListID] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Gets the last played song, wich playlist was selected last
     async function fetchData() {
       userSettings = await filehandler.getUserSettings();
-      setPlayListName(userSettings.playListName);
-      setPlayListsNames(await filehandler.loadFile('PlayListsNames'));
+
+      dispatch(setPlayListName(userSettings.playListName));
+      dispatch(setPlayListsNames(await filehandler.loadFile('PlayListsNames')));
     }
     fetchData();
   }, []); //notice the empty array here
-
-  // Set the state from a child element
-  // const setParentState = (data) => {
-  //   setState(data);
-  // };
 
   // Removes a song from the currently selected playList
   const removeFromPlayList = async (index) => {
     let playList = await filehandler.loadFile(playListName);
     playList.splice(index, 1);
-    soundObject.setPlayList(playList);
+    // soundObject.setPlayList(playList);
+    dispatch(setPlayList(playList));
     filehandler.saveFile(playListName, playList);
-    setPlayList(playList);
   };
 
   // Sets the playListID
@@ -58,11 +60,9 @@ export default function PlayList(props) {
 
   // Refreshes the playList and PlayListsNames
   const refresh = async () => {
-    playListArray = await filehandler.loadFile(playListName);
-    soundObject.setPlayList(playListArray);
-    soundObject.setPlayListName(playListName);
-    setPlayListsNames(await filehandler.loadFile('PlayListsNames'));
-    setPlayList(playListArray);
+    let playList = await filehandler.loadFile(playListName);
+    dispatch(setPlayList(playList));
+    dispatch(setPlayListsNames(await filehandler.loadFile('PlayListsNames')));
   };
 
   // Removes a playList
@@ -73,7 +73,7 @@ export default function PlayList(props) {
       if (element == playListName && playListName != 'PlayList') {
         let data = playListsNames;
         data.splice(index, 1);
-        setPlayListsNames(data);
+        dispatch(setPlayListsNames(data));
 
         await filehandler.deleteFile(playListName);
         await filehandler.saveFile('PlayListsNames', data);
@@ -87,13 +87,13 @@ export default function PlayList(props) {
   // refreshing after shuffle will return it to original
   const shufflePlayList = (array) => {
     array.sort(() => Math.random() - 0.5);
-    setPlayList(array);
+    dispatch(setPlayList(array));
   };
 
   // Sets the new playList then updates the userSettings and refreshes the flatlist with the new playList songs
   const handlePlayList = (playListName) => {
-    soundObject.setPlayListName(playListName);
-    setPlayListName(playListName);
+    // soundObject.setPlayListName(playListName);
+    dispatch(setPlayListName(playListName));
     filehandler.setUserSettings({
       playListName: playListName,
       index: 0,
