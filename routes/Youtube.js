@@ -85,11 +85,6 @@ export default function Youtube(props) {
     }
   };
 
-  // Set the state from a child element
-  setParentState = (data) => {
-    setState(data);
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.input}>

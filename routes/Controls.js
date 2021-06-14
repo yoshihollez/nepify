@@ -8,10 +8,8 @@ export default function Controls(props) {
   soundObject = props.soundObject;
   filehandler = props.filehandler;
   youTubeAPI = props.youTubeAPI;
-  // TODO find better way of implementing this
-  // soundObject.setYoutubeState(props.setParentState);
+
   const icon = useSelector((state) => state.icon.value);
-  const dispatch = useDispatch();
 
   return (
     <View style={styles.bottomButtons}>

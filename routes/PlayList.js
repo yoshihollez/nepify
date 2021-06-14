@@ -146,9 +146,7 @@ export default function PlayList(props) {
           data={playList}
           renderItem={({item, index}) => (
             <TouchableOpacity
-              onPress={() =>
-                soundObject.startPlayListFrom(index, setParentState)
-              }
+              onPress={() => soundObject.startPlayListFrom(index)}
               style={styles.flatList}>
               <Image style={styles.image} source={{uri: item.imageURL}} />
               <Text style={styles.item}>{item.songName}</Text>

@@ -20,8 +20,6 @@ export default class SoundHandler {
     this.playListName;
     this.playListIndex = 0;
     this.icon = 'play';
-    this.youtubeState;
-    this.playListState;
     this.shouldNotificationBeVisible = false;
 
     // Basic Controls for notification
@@ -56,24 +54,6 @@ export default class SoundHandler {
   // sets the playListIndex
   setPlayListIndex = (index) => {
     this.playListIndex = index;
-  };
-
-  // sets the youtubeState
-  setYoutubeState = (setState) => {
-    this.youtubeState = setState;
-  };
-
-  // sets the playListState
-  setPlayListState = (setState) => {
-    this.playListState = setState;
-  };
-
-  // sets the parent states
-  editParentStates = (data) => {
-    this.youtubeState(data);
-    try {
-      this.playListState(data);
-    } catch (error) {}
   };
 
   // plays a song
