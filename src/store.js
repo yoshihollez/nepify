@@ -1,5 +1,5 @@
 import {configureStore} from '@reduxjs/toolkit';
-import controlReducer from './controlSlice';
+import controlReducer from './ControlSlice';
 import playListReducer from './PlayListSlice';
 
 export default configureStore({
