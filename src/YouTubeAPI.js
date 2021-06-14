@@ -44,10 +44,13 @@ export default class YouTubeAPI {
   // returns a link to a audio file using a youtube link
   getSongURL = async (url) => {
     console.log('getSongURL');
-    console.log(url);
-    return await ytdl(url, {
+    let test = await ytdl(url, {
       quality: 'highestaudio',
     });
+    console.log('test');
+    console.log(test);
+
+    return test;
   };
 
   // gets songs from youtube playList and saves them in file

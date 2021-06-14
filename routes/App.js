@@ -2,11 +2,13 @@ import React from 'react';
 import {BottomNavigation} from 'react-native-paper';
 import PlayList from './PlayList';
 import Youtube from './Youtube';
+import Controls from './Controls';
 import SoundHandler from '../src/SoundHandler';
 import Filehandler from '../src/FileHandler';
 import YouTubeAPI from '../src/YouTubeAPI';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
-
+import store from '../src/store';
+import {Provider} from 'react-redux';
 // Battery optimization needs to be disabled otherwise app will stop working after few minutes of sleep.
 RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled().then(
   (isEnabled) => {
@@ -39,19 +41,37 @@ export default class App extends React.Component {
   };
 
   searchSongs = () => (
-    <Youtube
-      soundObject={soundObject}
-      filehandler={filehandler}
-      youTubeAPI={youTubeAPI}
-    />
+    <>
+      <Provider store={store}>
+        <Youtube
+          soundObject={soundObject}
+          filehandler={filehandler}
+          youTubeAPI={youTubeAPI}
+        />
+        <Controls
+          soundObject={soundObject}
+          filehandler={filehandler}
+          youTubeAPI={youTubeAPI}
+        />
+      </Provider>
+    </>
   );
 
   playList = () => (
-    <PlayList
-      soundObject={soundObject}
-      filehandler={filehandler}
-      youTubeAPI={youTubeAPI}
-    />
+    <>
+      <Provider store={store}>
+        <PlayList
+          soundObject={soundObject}
+          filehandler={filehandler}
+          youTubeAPI={youTubeAPI}
+        />
+        <Controls
+          soundObject={soundObject}
+          filehandler={filehandler}
+          youTubeAPI={youTubeAPI}
+        />
+      </Provider>
+    </>
   );
 
   _handleIndexChange = (index) => this.setState({index});
