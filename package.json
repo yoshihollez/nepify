@@ -13,6 +13,7 @@
     "@react-native-community/async-storage": "^1.11.0",
     "@react-native-community/picker": "^1.6.6",
     "@react-native-community/slider": "^2.0.9",
+    "@reduxjs/toolkit": "^1.6.0",
     "babel-plugin-dotenv-import": "^2.1.0",
     "react": "^16.14.0",
     "react-native": "^0.63.4",
@@ -25,7 +26,8 @@
     "react-native-popup-menu": "^0.15.9",
     "react-native-sound": "^0.11.0",
     "react-native-vector-icons": "^6.6.0",
-    "react-native-ytdl": "^4.8.2"
+    "react-native-ytdl": "^4.8.2",
+    "react-redux": "^7.2.4"
   },
   "devDependencies": {
     "@babel/core": "7.11.1",
