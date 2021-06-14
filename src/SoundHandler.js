@@ -4,7 +4,7 @@ import YouTubeAPI from './YouTubeAPI';
 import FileHandler from './FileHandler';
 import MusicControl from 'react-native-music-control';
 import store from './store';
-import {play, pause} from '../src/controlSlice';
+import {play, pause} from '../src/ControlSlice';
 
 let youTubeAPI = new YouTubeAPI();
 let fileHandler = new FileHandler();
@@ -19,7 +19,6 @@ export default class SoundHandler {
     this.playList = [];
     this.playListName;
     this.playListIndex = 0;
-    this.icon = 'play';
     this.shouldNotificationBeVisible = false;
 
     // Basic Controls for notification
@@ -45,11 +44,6 @@ export default class SoundHandler {
       this.previousSong();
     });
   }
-
-  // gets current icon
-  getIcon = () => {
-    return this.icon;
-  };
 
   // sets the playListIndex
   setPlayListIndex = (index) => {
@@ -136,10 +130,9 @@ export default class SoundHandler {
         });
       }
     } else {
-      console.log('test');
+      let playList = store.getState().playList.playList;
       let songData = await youTubeAPI.getSongURL(
-        'https://www.youtube.com/watch?v=' +
-          this.playList[this.playListIndex].key,
+        'https://www.youtube.com/watch?v=' + playList[this.playListIndex].key,
       );
       console.log(songData);
       this.handleTrackPlayer(songData[0].url);
@@ -149,6 +142,7 @@ export default class SoundHandler {
   // plays song
   playSong = async (item, nextSong) => {
     console.log('playSong');
+    let playList = store.getState().playList.playList;
     // after update to ytdl full url is now needed
     this.setNextSong = nextSong;
     this.pauseTrack();
@@ -163,9 +157,9 @@ export default class SoundHandler {
       this.handleTrackPlayer();
     }
     this.setNotification({
-      title: this.playList[this.playListIndex].songName,
-      artwork: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-      artist: this.playList[this.playListIndex].channel,
+      title: playList[this.playListIndex].songName,
+      artwork: playList[this.playListIndex].imageURL, // URL or RN's image require()
+      artist: playList[this.playListIndex].channel,
     });
   };
 
@@ -191,22 +185,23 @@ export default class SoundHandler {
 
   // Starts playing songs from a playList at a certain position
   startPlayListFrom = (index) => {
+    let playList = store.getState().playList.playList;
     console.log('startPlayListFrom');
     if (index == 'next') {
       index = this.playListIndex + 1;
     } else if (index == 'previous') {
       index = this.playListIndex - 1;
     }
-    if (index >= 0 && index < this.playList.length) {
+    if (index >= 0 && index < playList.length) {
       this.playListIndex = index;
       fileHandler.setUserSettings({
         playListName: this.playListName,
         index: this.playListIndex,
-        songName: this.playList[this.playListIndex].songName,
-        imageURL: this.playList[this.playListIndex].imageURL, // URL or RN's image require()
-        channel: this.playList[this.playListIndex].channel,
+        songName: playList[this.playListIndex].songName,
+        imageURL: playList[this.playListIndex].imageURL, // URL or RN's image require()
+        channel: playList[this.playListIndex].channel,
       });
-      this.playSong(this.playList[index], this.nextSong);
+      this.playSong(playList[index], this.nextSong);
     }
   };
 
